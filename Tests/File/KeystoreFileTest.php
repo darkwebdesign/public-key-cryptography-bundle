@@ -21,11 +21,9 @@
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Tests\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\File\File;
 
 class KeystoreFileTest extends TestCase
 {
@@ -59,19 +57,21 @@ class KeystoreFileTest extends TestCase
     {
         copy($pathname, $this->file);
 
-        new File($this->file);
+        new KeystoreFile($this->file);
     }
 
     /**
      * @param string $pathname
      *
      * @dataProvider providerPathnamesNotKeystoreFile
+     *
+     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
     public function testNewInstanceNotKeystoreFile($pathname)
     {
         copy($pathname, $this->file);
 
-        new File($this->file);
+        new KeystoreFile($this->file);
     }
 
     /**

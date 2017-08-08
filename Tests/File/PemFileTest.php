@@ -20,12 +20,10 @@
 
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Tests\File;
 
-use DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\File\File;
 
 class PemFileTest extends TestCase
 {
@@ -59,19 +57,21 @@ class PemFileTest extends TestCase
     {
         copy($pathname, $this->file);
 
-        new File($this->file);
+        new PemFile($this->file);
     }
 
     /**
      * @param string $pathname
      *
      * @dataProvider providerPathnamesNotPemFile
+     *
+     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
     public function testNewInstanceNotPemFile($pathname)
     {
         copy($pathname, $this->file);
 
-        new File($this->file);
+        new PemFile($this->file);
     }
 
     /**
