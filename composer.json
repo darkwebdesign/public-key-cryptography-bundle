@@ -1,0 +1,30 @@
+{
+    "name": "darkwebdesign/public-key-cryptography-bundle",
+    "type": "library",
+    "description": "Public Key Cryptography Bundle",
+    "keywords": ["bundle", "cryptography", "symfony"],
+    "homepage": "http://www.darkwebdesign.nl/",
+    "license": "MIT",
+    "authors": [
+        {"name": "Raymond Schouten"}
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/http-foundation": "^2.3",
+        "symfony/process": "^2.3"
+    },
+    "require-dev": {
+        "codeclimate/php-test-reporter": "^0.3.2",
+        "phpunit/phpunit": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "DarkWebDesign\\PublicKeyCryptographyBundle\\": ""
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "DarkWebDesign\\PublicKeyCryptographyBundle\\Tests\\": "Tests/"
+        }
+    }
+}
