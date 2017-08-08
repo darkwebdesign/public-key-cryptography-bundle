@@ -101,6 +101,23 @@ class PrivateKeyFileTest extends TestCase
         $privateKeyFile->convertFormat($format);
     }
 
+    /**
+     * @param string $pathname
+     * @param string|null $privateKeyPassword
+     *
+     * @dataProvider providerPathnamesAndPasswords
+     */
+    public function testHasPassphrase($pathname, $privateKeyPassword = null)
+    {
+        copy($pathname, $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $hasPassphrase = $privateKeyFile->hasPassphrase();
+
+        $this->assertSame(null !== $privateKeyPassword, $hasPassphrase);
+    }
+
     public function testMove()
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
@@ -123,6 +140,22 @@ class PrivateKeyFileTest extends TestCase
             array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key'),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key'),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'),
+        );
+    }
+
+    /**
+     * return array[]
+     */
+    public function providerPathnamesAndPasswords()
+    {
+        return array(
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', static::TEST_PASSWORD),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', static::TEST_PASSWORD),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', static::TEST_PASSWORD),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'),
         );

@@ -118,6 +118,26 @@ class PrivateKeyFile extends CryptoFile
     }
 
     /**
+     * @return bool
+     */
+    public function hasPassphrase()
+    {
+        $in = escapeshellarg($this->getPathname());
+        $inForm = escapeshellarg($this->getFormat());
+
+        // issue: `openssl rsa` can't read PKCS#8 DER format with passphrase -> use `openssl pkcs8` as fallback
+        $command = "
+            openssl rsa -in $in -inform $inForm -passin pass: -check -noout ||
+            openssl pkcs8 -in $in -inform $inForm -passin pass: ||
+            openssl pkcs8 -in $in -inform $inForm -nocrypt";
+
+        $process = new Process($command);
+        $process->run();
+
+        return !$process->isSuccessful();
+    }
+
+    /**
      * @param string $directory
      * @param string|null $name
      *

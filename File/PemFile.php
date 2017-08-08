@@ -237,6 +237,25 @@ class PemFile extends CryptoFile
     }
 
     /**
+     * @return bool
+     */
+    public function hasPassphrase()
+    {
+        $in = escapeshellarg($this->getPathname());
+
+        // issue: `openssl rsa` can't read PKCS#8 DER format with passphrase -> use `openssl pkcs8` as fallback
+        $command = "
+            openssl rsa -in $in -passin pass: -check -noout ||
+            openssl pkcs8 -in $in -passin pass: ||
+            openssl pkcs8 -in $in -nocrypt";
+
+        $process = new Process($command);
+        $process->run();
+
+        return !$process->isSuccessful();
+    }
+
+    /**
      * @param string $directory
      * @param string|null $name
      *

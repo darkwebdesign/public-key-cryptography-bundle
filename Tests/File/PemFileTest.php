@@ -207,6 +207,23 @@ class PemFileTest extends TestCase
         $this->assertSame(static::TEST_NOT_AFTER, $notAfter->format('Y-m-d H:i:s'));
     }
 
+    /**
+     * @param string $pathname
+     * @param string|null $privateKeyPassword
+     *
+     * @dataProvider providerPathnamesAndPasswords
+     */
+    public function testHasPassphrase($pathname, $privateKeyPassword = null)
+    {
+        copy($pathname, $this->file);
+
+        $pemFile = new PemFile($this->file);
+
+        $hasPassphrase = $pemFile->hasPassphrase();
+
+        $this->assertSame(null !== $privateKeyPassword, $hasPassphrase);
+    }
+
     public function testMove()
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pem-nopass.pem', $this->file);
