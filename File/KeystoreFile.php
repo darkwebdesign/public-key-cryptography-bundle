@@ -39,19 +39,16 @@ class KeystoreFile extends CryptoFile
      */
     protected function validate()
     {
-//        $command = sprintf(
-//            'openssl pkcs12 -in %1$s -passin pass:',
-//            escapeshellarg($file->getPathname())
-//        );
-//
-//        $process = new Process($command);
-//        $process->run();
-//
-//        $invalidPassword = false !== strpos($process->getErrorOutput(), 'invalid password');
-//
-//        return $process->isSuccessful() || $invalidPassword;
+        $in = escapeshellarg($this->getPathname());
 
-        return true;
+        $command = "openssl pkcs12 -in $in -passin pass:";
+
+        $process = new Process($command);
+        $process->run();
+
+        $invalidPassword = false !== strpos($process->getErrorOutput(), 'invalid password');
+
+        return $process->isSuccessful() || $invalidPassword;
     }
 
     /**
