@@ -24,10 +24,11 @@ Symfony applications.
 * Extracts public/private keys from keystore/PEM.
 * Extracts PEM from keystore and vice versa.
 
-### Retrieval
+### Analysis
 
-* Retrieves format (PEM/DER) of public/private keys
-* Retrieves subject, issuer, notBefore and notAfter properties from keystore/PEM/public key.
+* Checks format (PEM/DER) of public/private keys
+* Checks subject, issuer, notBefore and notAfter properties from keystore/PEM/public key.
+* Checks whether keystore/PEM/private key contains a passphrase.
 
 ### Conversion
 
@@ -37,6 +38,10 @@ Symfony applications.
 
 * Adds/removes passphrase from PEM/private key.
 * Changes passphrase of keystore/PEM/private key.
+
+## Dependencies
+
+* `openssl` and `keytool` shell commands
 
 ## Installing via Composer
 
