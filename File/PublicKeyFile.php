@@ -82,7 +82,7 @@ class PublicKeyFile extends CryptoFile
         $process = new Process($command);
         $process->mustRun();
 
-        return trim(ltrim($process->getOutput(), 'subject='));
+        return trim(preg_replace('/^subject=/', '', $process->getOutput()));
     }
 
     /**
@@ -98,7 +98,7 @@ class PublicKeyFile extends CryptoFile
         $process = new Process($command);
         $process->mustRun();
 
-        return trim(ltrim($process->getOutput(), 'issuer='));
+        return trim(preg_replace('/^issuer=/', '', $process->getOutput()));
     }
 
     /**
@@ -114,7 +114,7 @@ class PublicKeyFile extends CryptoFile
         $process = new Process($command);
         $process->mustRun();
 
-        return new \DateTime(trim(ltrim($process->getOutput(), 'notBefore=')));
+        return new \DateTime(trim(preg_replace('/^notBefore=/', '', $process->getOutput())));
     }
 
     /**
@@ -130,7 +130,7 @@ class PublicKeyFile extends CryptoFile
         $process = new Process($command);
         $process->mustRun();
 
-        return new \DateTime(trim(ltrim($process->getOutput(), 'notAfter=')));
+        return new \DateTime(trim(preg_replace('/^notAfter=/', '', $process->getOutput())));
     }
 
     /**
