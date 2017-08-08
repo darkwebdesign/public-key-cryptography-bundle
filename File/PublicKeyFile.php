@@ -29,8 +29,6 @@ use Symfony\Component\Process\Process;
  * @author Raymond Schouten
  *
  * @since 1.0
- *
- * @todo verify needs to exclude PEM files
  */
 class PublicKeyFile extends CryptoFile
 {
