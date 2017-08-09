@@ -37,6 +37,8 @@ class PublicKeyFile extends CryptoFile
     const FORMAT_DER = 'der';
 
     /**
+     * Validates that the file is actually a public key.
+     *
      * @return bool
      */
     protected function validate()
@@ -68,6 +70,8 @@ class PublicKeyFile extends CryptoFile
     }
 
     /**
+     * Gets the public key format (either ascii 'pem' or binary 'der').
+     *
      * @return string
      */
     public function getFormat()
@@ -76,6 +80,8 @@ class PublicKeyFile extends CryptoFile
     }
 
     /**
+     * Gets the public key "subject" attribute.
+     *
      * @return string
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -94,6 +100,8 @@ class PublicKeyFile extends CryptoFile
     }
 
     /**
+     * Gets the public key "issuer" attribute.
+     *
      * @return string
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -112,6 +120,8 @@ class PublicKeyFile extends CryptoFile
     }
 
     /**
+     * Gets the public key "notBefore" attribute.
+     *
      * @return \DateTime
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -130,6 +140,8 @@ class PublicKeyFile extends CryptoFile
     }
 
     /**
+     * Gets the public key "notAfter" attribute.
+     *
      * @return \DateTime
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -148,6 +160,8 @@ class PublicKeyFile extends CryptoFile
     }
 
     /**
+     * Converts the public key format to either ascii 'pem' or binary 'der'.
+     *
      * @param string $format
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile
@@ -186,6 +200,8 @@ class PublicKeyFile extends CryptoFile
     }
 
     /**
+     * Moves the file to a new location.
+     *
      * @param string $directory
      * @param string|null $name
      *

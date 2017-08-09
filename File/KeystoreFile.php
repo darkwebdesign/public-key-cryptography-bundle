@@ -36,6 +36,8 @@ use Symfony\Component\Process\Process;
 class KeystoreFile extends CryptoFile
 {
     /**
+     * Validates that the file is actually a keystore containing a public/private key pair.
+     *
      * @return bool
      */
     protected function validate()
@@ -57,7 +59,9 @@ class KeystoreFile extends CryptoFile
     }
 
     /**
-     * @param string $pathname
+     * Creates a new keystore from a public/private key pair.
+     *
+     * @param string $path
      * @param string $passPhrase
      * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile $publicKeyFile
      * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile $privateKeyFile
@@ -68,13 +72,13 @@ class KeystoreFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public static function create($pathname, $passPhrase, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, $privateKeyPassPhrase = null)
+    public static function create($path, $passPhrase, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, $privateKeyPassPhrase = null)
     {
         if ('' === $privateKeyPassPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
         }
 
-        $out = escapeshellarg($pathname);
+        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
         $publicKeyIn = escapeshellarg($publicKeyFile->getPathname());
         $publicKeyInForm = escapeshellarg($publicKeyFile->getFormat());
@@ -94,21 +98,23 @@ class KeystoreFile extends CryptoFile
         $process = new Process($command);
         $process->mustRun();
 
-        return new self($pathname);
+        return new self($path);
     }
 
     /**
-     * @param string $pathname
+     * Gets a PEM file containing the public/private key pair.
+     *
+     * @param string $path
      * @param string $passPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPem($pathname, $passPhrase)
+    public function getPem($path, $passPhrase)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($pathname);
+        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
 
         // if the keystore pass phrase is an empty string, the outputted private key will not contain a pass phrase
@@ -131,23 +137,25 @@ class KeystoreFile extends CryptoFile
         $process = new Process($command);
         $process->mustRun();
 
-        @chmod($pathname, 0666 & ~umask());
+        @chmod($path, 0666 & ~umask());
 
-        return new PemFile($pathname);
+        return new PemFile($path);
     }
 
     /**
-     * @param string $pathname
+     * Gets the public key.
+     *
+     * @param string $path
      * @param string $passPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPublicKey($pathname, $passPhrase)
+    public function getPublicKey($path, $passPhrase)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($pathname);
+        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
 
         $command = "
@@ -158,23 +166,25 @@ class KeystoreFile extends CryptoFile
         $process = new Process($command);
         $process->mustRun();
 
-        @chmod($pathname, 0666 & ~umask());
+        @chmod($path, 0666 & ~umask());
 
-        return new PublicKeyFile($pathname);
+        return new PublicKeyFile($path);
     }
 
     /**
-     * @param string $pathname
+     * Gets the private key.
+     *
+     * @param string $path
      * @param string $passPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPrivateKey($pathname, $passPhrase)
+    public function getPrivateKey($path, $passPhrase)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($pathname);
+        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
 
         // if the keystore pass phrase is an empty string, the outputted private key will not contain a pass phrase
@@ -192,12 +202,14 @@ class KeystoreFile extends CryptoFile
         $process = new Process($command);
         $process->mustRun();
 
-        @chmod($pathname, 0666 & ~umask());
+        @chmod($path, 0666 & ~umask());
 
-        return new PrivateKeyFile($pathname);
+        return new PrivateKeyFile($path);
     }
 
     /**
+     * Gets the public key "subject" attribute.
+     *
      * @param string $passPhrase
      *
      * @return string
@@ -220,6 +232,8 @@ class KeystoreFile extends CryptoFile
     }
 
     /**
+     * Gets the public key "issuer" attribute.
+     *
      * @param string $passPhrase
      *
      * @return string
@@ -242,6 +256,8 @@ class KeystoreFile extends CryptoFile
     }
 
     /**
+     * Gets the public key "notBefore" attribute.
+     *
      * @param string $passPhrase
      *
      * @return \DateTime
@@ -264,6 +280,8 @@ class KeystoreFile extends CryptoFile
     }
 
     /**
+     * Gets the public key "notAfter" attribute.
+     *
      * @param string $passPhrase
      *
      * @return \DateTime
@@ -286,6 +304,8 @@ class KeystoreFile extends CryptoFile
     }
 
     /**
+     * Verifies a pass phrase against the keystore.
+     *
      * @param string $passPhrase
      *
      * @return bool
@@ -304,6 +324,8 @@ class KeystoreFile extends CryptoFile
     }
 
     /**
+     * Changes the pass phrase of the keystore.
+     *
      * @param string $passPhrase
      * @param string $newPassPhrase
      *
@@ -339,6 +361,8 @@ class KeystoreFile extends CryptoFile
     }
 
     /**
+     * Moves the file to a new location.
+     *
      * @param string $directory
      * @param string|null $name
      *

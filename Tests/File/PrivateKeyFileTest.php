@@ -44,40 +44,40 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPrivateKeys
      */
-    public function testNewInstance($pathname)
+    public function testNewInstance($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         new PrivateKeyFile($this->file);
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerNotPrivateKeys
      *
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
-    public function testNewInstanceNotPrivateKey($pathname)
+    public function testNewInstanceNotPrivateKey($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         new PrivateKeyFile($this->file);
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string $format
      *
      * @dataProvider providerPrivateKeysAndFormats
      */
-    public function testGetFormat($pathname, $format)
+    public function testGetFormat($path, $format)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
 
@@ -85,15 +85,15 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string $format
      * @param string|null $passPhrase
      *
      * @dataProvider providerConvertFormat
      */
-    public function testConvertFormat($pathname, $format, $passPhrase = null)
+    public function testConvertFormat($path, $format, $passPhrase = null)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
 
@@ -129,14 +129,14 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param bool $privateKeyHasPassphrase
      *
      * @dataProvider providerHasPassPhrase
      */
-    public function testHasPassPhrase($pathname, $hasPassphrase)
+    public function testHasPassPhrase($path, $hasPassphrase)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
 
@@ -144,13 +144,13 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPrivateKeysHavingPassPhrases
      */
-    public function testVerifyPassPhrase($pathname)
+    public function testVerifyPassPhrase($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
 
@@ -164,13 +164,13 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPrivateKeysNotHavingPassPhrases
      */
-    public function testAddPassPhrase($pathname)
+    public function testAddPassPhrase($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
 
@@ -194,13 +194,13 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPrivateKeysHavingPassPhrases
      */
-    public function testRemovePassPhrase($pathname)
+    public function testRemovePassPhrase($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
 
@@ -210,13 +210,13 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPrivateKeysHavingPassPhrases
      */
-    public function testChangePassPhrase($pathname)
+    public function testChangePassPhrase($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
 

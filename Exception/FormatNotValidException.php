@@ -21,6 +21,8 @@
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Exception;
 
 /**
+ * Thrown when a format was not valid.
+ *
  * @author Raymond Schouten
  *
  * @since 1.0

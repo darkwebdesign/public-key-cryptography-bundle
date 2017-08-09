@@ -47,40 +47,40 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPublicKeys
      */
-    public function testNewInstance($pathname)
+    public function testNewInstance($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         new PublicKeyFile($this->file);
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerNotPublicKeys
      *
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
-    public function testNewInstanceNotPublicKey($pathname)
+    public function testNewInstanceNotPublicKey($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         new PublicKeyFile($this->file);
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string $format
      *
      * @dataProvider providerPublicKeysAndFormats
      */
-    public function testGetFormat($pathname, $format)
+    public function testGetFormat($path, $format)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $publicKeyFile = new PublicKeyFile($this->file);
 
@@ -88,13 +88,13 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPublicKeys
      */
-    public function testGetSubject($pathname)
+    public function testGetSubject($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $publicKeyFile = new PublicKeyFile($this->file);
 
@@ -102,13 +102,13 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPublicKeys
      */
-    public function testGetIssuer($pathname)
+    public function testGetIssuer($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $publicKeyFile = new PublicKeyFile($this->file);
 
@@ -116,13 +116,13 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPublicKeys
      */
-    public function testGetNotBefore($pathname)
+    public function testGetNotBefore($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $publicKeyFile = new PublicKeyFile($this->file);
 
@@ -133,13 +133,13 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPublicKeys
      */
-    public function testGetNotAfter($pathname)
+    public function testGetNotAfter($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $publicKeyFile = new PublicKeyFile($this->file);
 
@@ -150,14 +150,14 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string $format
      *
      * @dataProvider providerConvertFormat
      */
-    public function testConvertFormat($pathname, $format)
+    public function testConvertFormat($path, $format)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $publicKeyFile = new PublicKeyFile($this->file);
 

@@ -50,42 +50,42 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerKeystores
      */
-    public function testNewInstance($pathname)
+    public function testNewInstance($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         new KeystoreFile($this->file);
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerNotKeystores
      *
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
-    public function testNewInstanceNotKeystoreFile($pathname)
+    public function testNewInstanceNotKeystoreFile($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         new KeystoreFile($this->file);
     }
 
     /**
-     * @param string $publicKeyPathname
-     * @param string $privateKeyPathname
+     * @param string $publicKeyPath
+     * @param string $privateKeyPath
      * @param string|null $privateKeyPassPhrase
      *
      * @dataProvider providerCreate
      */
-    public function testCreate($publicKeyPathname, $privateKeyPathname, $privateKeyPassPhrase = null)
+    public function testCreate($publicKeyPath, $privateKeyPath, $privateKeyPassPhrase = null)
     {
-        $publicKeyFile = new PublicKeyFile($publicKeyPathname);
-        $privateKeyFile = new PrivateKeyFile($privateKeyPathname);
+        $publicKeyFile = new PublicKeyFile($publicKeyPath);
+        $privateKeyFile = new PrivateKeyFile($privateKeyPath);
 
         $keystoreFile = KeystoreFile::create($this->file, static::TEST_PASSPHRASE, $publicKeyFile, $privateKeyFile, $privateKeyPassPhrase);
 
@@ -104,14 +104,14 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string $passPhrase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetPem($pathname, $passPhrase)
+    public function testGetPem($path, $passPhrase)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
 
@@ -132,14 +132,14 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string $passPhrase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetPublicKey($pathname, $passPhrase)
+    public function testGetPublicKey($path, $passPhrase)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
 
@@ -149,14 +149,14 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string $passPhrase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetPrivateKey($pathname, $passPhrase)
+    public function testGetPrivateKey($path, $passPhrase)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
 
@@ -177,14 +177,14 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string $passPhrase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetSubject($pathname, $passPhrase)
+    public function testGetSubject($path, $passPhrase)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
 
@@ -194,14 +194,14 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string $passPhrase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetIssuer($pathname, $passPhrase)
+    public function testGetIssuer($path, $passPhrase)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
 
@@ -211,14 +211,14 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string $passPhrase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetNotBefore($pathname, $passPhrase)
+    public function testGetNotBefore($path, $passPhrase)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
 
@@ -229,14 +229,14 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string $passPhrase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetNotAfter($pathname, $passPhrase)
+    public function testGetNotAfter($path, $passPhrase)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
 
@@ -247,14 +247,14 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string $passPhrase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testVerifyPassPhrase($pathname, $passPhrase)
+    public function testVerifyPassPhrase($path, $passPhrase)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
 
@@ -268,14 +268,14 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string $passPhrase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testChangePassPhrase($pathname, $passPhrase)
+    public function testChangePassPhrase($path, $passPhrase)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
 

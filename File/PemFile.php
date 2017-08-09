@@ -35,6 +35,8 @@ use Symfony\Component\Process\Process;
 class PemFile extends CryptoFile
 {
     /**
+     * Validates that the file is actually a PEM file containing a public/private key pair.
+     *
      * @return bool
      */
     protected function validate()
@@ -65,7 +67,9 @@ class PemFile extends CryptoFile
     }
 
     /**
-     * @param string $pathname
+     * Creates a new PEM file from a public/private key pair.
+     *
+     * @param string $path
      * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile  $publicKeyFile
      * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile $privateKeyFile
      * @param string|null $privateKeyPassPhrase
@@ -75,13 +79,13 @@ class PemFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public static function create($pathname, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, $privateKeyPassPhrase = null)
+    public static function create($path, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, $privateKeyPassPhrase = null)
     {
         if ('' === $privateKeyPassPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
         }
 
-        $out = escapeshellarg($pathname);
+        $out = escapeshellarg($path);
         $publicKeyIn = escapeshellarg($publicKeyFile->getPathname());
         $publicKeyInForm = escapeshellarg($publicKeyFile->getFormat());
         $privateKeyIn = escapeshellarg($privateKeyFile->getPathname());
@@ -105,13 +109,15 @@ class PemFile extends CryptoFile
         $process = new Process($command);
         $process->mustRun();
 
-        @chmod($pathname, 0666 & ~umask());
+        @chmod($path, 0666 & ~umask());
 
-        return new self($pathname);
+        return new self($path);
     }
 
     /**
-     * @param string $pathname
+     * Gets a keystore containing the public/private key pair.
+     *
+     * @param string $path
      * @param string $keystorePassPhrase
      * @param string|null $privateKeyPassPhrase
      *
@@ -120,14 +126,14 @@ class PemFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getKeystore($pathname, $keystorePassPhrase, $privateKeyPassPhrase = null)
+    public function getKeystore($path, $keystorePassPhrase, $privateKeyPassPhrase = null)
     {
         if ('' === $privateKeyPassPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
         }
 
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($pathname);
+        $out = escapeshellarg($path);
         $keystorePass = escapeshellarg($keystorePassPhrase);
         $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
 
@@ -139,22 +145,24 @@ class PemFile extends CryptoFile
         $process = new Process($command);
         $process->mustRun();
 
-        @chmod($pathname, 0666 & ~umask());
+        @chmod($path, 0666 & ~umask());
 
-        return new KeystoreFile($pathname);
+        return new KeystoreFile($path);
     }
 
     /**
-     * @param string $pathname
+     * Gets the public key.
+     *
+     * @param string $path
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPublicKey($pathname)
+    public function getPublicKey($path)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($pathname);
+        $out = escapeshellarg($path);
 
         $command = "
             openssl x509 -in $in -out $out~ &&
@@ -164,13 +172,15 @@ class PemFile extends CryptoFile
         $process = new Process($command);
         $process->mustRun();
 
-        @chmod($pathname, 0666 & ~umask());
+        @chmod($path, 0666 & ~umask());
 
-        return new PublicKeyFile($pathname);
+        return new PublicKeyFile($path);
     }
 
     /**
-     * @param string $pathname
+     * Gets the private key.
+     *
+     * @param string $path
      * @param string|null $privateKeyPassPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
@@ -178,14 +188,14 @@ class PemFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPrivateKey($pathname, $privateKeyPassPhrase = null)
+    public function getPrivateKey($path, $privateKeyPassPhrase = null)
     {
         if ('' === $privateKeyPassPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
         }
 
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($pathname);
+        $out = escapeshellarg($path);
         $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
 
         if (null !== $privateKeyPassPhrase) {
@@ -202,12 +212,14 @@ class PemFile extends CryptoFile
         $process = new Process($command);
         $process->mustRun();
 
-        @chmod($pathname, 0666 & ~umask());
+        @chmod($path, 0666 & ~umask());
 
-        return new PrivateKeyFile($pathname);
+        return new PrivateKeyFile($path);
     }
 
     /**
+     * Gets the public key "subject" attribute.
+     *
      * @return string
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -225,6 +237,8 @@ class PemFile extends CryptoFile
     }
 
     /**
+     * Gets the public key "issuer" attribute.
+     *
      * @return string
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -242,6 +256,8 @@ class PemFile extends CryptoFile
     }
 
     /**
+     * Gets the public key "notBefore" attribute.
+     *
      * @return \DateTime
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -259,6 +275,8 @@ class PemFile extends CryptoFile
     }
 
     /**
+     * Gets the public key "notAfter" attribute.
+     *
      * @return \DateTime
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -276,6 +294,8 @@ class PemFile extends CryptoFile
     }
 
     /**
+     * Checks if the private key contains a pass phrase.
+     *
      * @return bool
      */
     public function hasPassPhrase()
@@ -291,6 +311,8 @@ class PemFile extends CryptoFile
     }
 
     /**
+     * Verifies a pass phrase against the private key.
+     *
      * @param string $passPhrase
      *
      * @return bool
@@ -309,6 +331,8 @@ class PemFile extends CryptoFile
     }
 
     /**
+     * Adds a pass phrase to the private key.
+     *
      * @param string $passPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile
@@ -343,6 +367,8 @@ class PemFile extends CryptoFile
     }
 
     /**
+     * Removes the pass phrase from the private key.
+     *
      * @param string $passPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile
@@ -372,6 +398,8 @@ class PemFile extends CryptoFile
     }
 
     /**
+     * Changes the pass phrase of the private key.
+     *
      * @param string $passPhrase
      * @param string $newPassPhrase
      *
@@ -382,7 +410,7 @@ class PemFile extends CryptoFile
      */
     public function changePassPhrase($passPhrase, $newPassPhrase)
     {
-        if ('' === $passPhrase || '' === $newPassPhrase) {
+        if ('' === $newPassPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
         }
 
@@ -408,6 +436,8 @@ class PemFile extends CryptoFile
     }
 
     /**
+     * Moves the file to a new location.
+     *
      * @param string $directory
      * @param string|null $name
      *

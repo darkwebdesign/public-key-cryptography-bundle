@@ -50,42 +50,42 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPems
      */
-    public function testNewInstance($pathname)
+    public function testNewInstance($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         new PemFile($this->file);
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerNotPems
      *
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
-    public function testNewInstanceNotPem($pathname)
+    public function testNewInstanceNotPem($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         new PemFile($this->file);
     }
 
     /**
-     * @param string $publicKeyPathname
-     * @param string $privateKeyPathname
+     * @param string $publicKeyPath
+     * @param string $privateKeyPath
      * @param string|null $privateKeyPassPhrase
      *
      * @dataProvider providerCreate
      */
-    public function testCreate($publicKeyPathname, $privateKeyPathname, $privateKeyPassPhrase = null)
+    public function testCreate($publicKeyPath, $privateKeyPath, $privateKeyPassPhrase = null)
     {
-        $publicKeyFile = new PublicKeyFile($publicKeyPathname);
-        $privateKeyFile = new PrivateKeyFile($privateKeyPathname);
+        $publicKeyFile = new PublicKeyFile($publicKeyPath);
+        $privateKeyFile = new PrivateKeyFile($privateKeyPath);
 
         $pemFile = PemFile::create($this->file, $publicKeyFile, $privateKeyFile, $privateKeyPassPhrase);
 
@@ -104,14 +104,14 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string|null $privateKeyPassPhrase
      *
      * @dataProvider providerPemsAndPassPhrases
      */
-    public function testGetKeystore($pathname, $privateKeyPassPhrase = null)
+    public function testGetKeystore($path, $privateKeyPassPhrase = null)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 
@@ -133,13 +133,13 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPems
      */
-    public function testGetPublicKey($pathname)
+    public function testGetPublicKey($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 
@@ -149,14 +149,14 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string|null $privateKeyPassPhrase
      *
      * @dataProvider providerPemsAndPassPhrases
      */
-    public function testGetPrivateKey($pathname, $privateKeyPassPhrase = null)
+    public function testGetPrivateKey($path, $privateKeyPassPhrase = null)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 
@@ -178,13 +178,13 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPems
      */
-    public function testGetSubject($pathname)
+    public function testGetSubject($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 
@@ -192,13 +192,13 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPems
      */
-    public function testGetIssuer($pathname)
+    public function testGetIssuer($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 
@@ -206,13 +206,13 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPems
      */
-    public function testGetNotBefore($pathname)
+    public function testGetNotBefore($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 
@@ -223,13 +223,13 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPems
      */
-    public function testGetNotAfter($pathname)
+    public function testGetNotAfter($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 
@@ -240,14 +240,14 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      * @param string|null $privateKeyPassPhrase
      *
      * @dataProvider providerPemsAndPassPhrases
      */
-    public function testHasPassPhrase($pathname, $privateKeyPassPhrase = null)
+    public function testHasPassPhrase($path, $privateKeyPassPhrase = null)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 
@@ -255,13 +255,13 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPemsHavingPassPhrases
      */
-    public function testVerifyPassPhrase($pathname)
+    public function testVerifyPassPhrase($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 
@@ -275,13 +275,13 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPemsNotHavingPassPhrases
      */
-    public function testAddPassPhrase($pathname)
+    public function testAddPassPhrase($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 
@@ -305,13 +305,13 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPemsHavingPassPhrases
      */
-    public function testRemovePassPhrase($pathname)
+    public function testRemovePassPhrase($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 
@@ -321,13 +321,13 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @param string $pathname
+     * @param string $path
      *
      * @dataProvider providerPemsHavingPassPhrases
      */
-    public function testChangePassPhrase($pathname)
+    public function testChangePassPhrase($path)
     {
-        copy($pathname, $this->file);
+        copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 

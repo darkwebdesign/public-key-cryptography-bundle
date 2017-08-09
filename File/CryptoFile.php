@@ -32,6 +32,8 @@ use Symfony\Component\Process\Process;
 abstract class CryptoFile extends File
 {
     /**
+     * Constructs a new file from the given path.
+     *
      * @param string $path
      *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
@@ -47,11 +49,15 @@ abstract class CryptoFile extends File
     }
 
     /**
+     * Validates that the file is actually of the correct type.
+     *
      * @return bool
      */
     abstract protected function validate();
 
     /**
+     * Checks if the file is binary.
+     *
      * @return bool
      */
     protected function isBinary()
@@ -68,6 +74,8 @@ abstract class CryptoFile extends File
     }
 
     /**
+     * Moves the file to a new location.
+     *
      * @param string $directory
      * @param string|null $name
      *

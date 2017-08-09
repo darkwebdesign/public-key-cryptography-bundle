@@ -21,6 +21,8 @@
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Exception;
 
 /**
+ * Thrown when a private key pass phrase was empty.
+ *
  * @author Raymond Schouten
  *
  * @since 1.0

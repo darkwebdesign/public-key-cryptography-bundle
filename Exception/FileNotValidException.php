@@ -23,6 +23,8 @@ namespace DarkWebDesign\PublicKeyCryptographyBundle\Exception;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 /**
+ * Thrown when a file was not valid.
+ *
  * @author Raymond Schouten
  *
  * @since 1.0

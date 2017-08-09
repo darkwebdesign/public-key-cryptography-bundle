@@ -38,6 +38,8 @@ class PrivateKeyFile extends CryptoFile
     const FORMAT_DER = 'der';
 
     /**
+     * Validates that the file is actually a private key.
+     *
      * @return bool
      */
     protected function validate()
@@ -69,6 +71,8 @@ class PrivateKeyFile extends CryptoFile
     }
 
     /**
+     * Gets the private key format (either ascii 'pem' or binary 'der').
+     *
      * @return string
      */
     public function getFormat()
@@ -77,6 +81,8 @@ class PrivateKeyFile extends CryptoFile
     }
 
     /**
+     * Converts the private key format to either ascii 'pem' or binary 'der'.
+     *
      * @param string $format
      * @param string|null $passPhrase
      *
@@ -128,6 +134,8 @@ class PrivateKeyFile extends CryptoFile
     }
 
     /**
+     * Checks if the private key contains a pass phrase.
+     *
      * @return bool
      */
     public function hasPassPhrase()
@@ -144,6 +152,8 @@ class PrivateKeyFile extends CryptoFile
     }
 
     /**
+     * Verifies a pass phrase against the private key.
+     *
      * @param string $passPhrase
      *
      * @return bool
@@ -163,6 +173,8 @@ class PrivateKeyFile extends CryptoFile
     }
 
     /**
+     * Adds a pass phrase to the private key.
+     *
      * @param string $passPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
@@ -195,6 +207,8 @@ class PrivateKeyFile extends CryptoFile
     }
 
     /**
+     * Removes the pass phrase from the private key.
+     *
      * @param string $passPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
@@ -222,6 +236,8 @@ class PrivateKeyFile extends CryptoFile
     }
 
     /**
+     * Changes the pass phrase of the private key.
+     *
      * @param string $passPhrase
      * @param string $newPassPhrase
      *
@@ -256,6 +272,8 @@ class PrivateKeyFile extends CryptoFile
     }
 
     /**
+     * Moves the file to a new location.
+     *
      * @param string $directory
      * @param string|null $name
      *
