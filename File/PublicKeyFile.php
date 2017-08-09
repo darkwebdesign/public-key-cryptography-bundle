@@ -20,6 +20,7 @@
 
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
+use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\CryptoFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
@@ -43,20 +44,27 @@ class PublicKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        // issue: `openssl rsa` can't read PKCS#8 DER format with passphrase -> use `openssl pkcs8` as fallback
-        $command = "
-            openssl x509 -in $in -inform $inForm -noout && 
-            ! (
-                error=$(openssl rsa -in $in -inform $inForm -passin pass: -check -noout 2>&1 >/dev/null) ||
-                echo \"\$error\" | grep --regexp ':bad password read:' ||
-                error=$(openssl pkcs8 -in $in -inform $inForm -passin pass: 2>&1 >/dev/null) ||
-                echo \"\$error\" | grep --regexp ':bad decrypt:'
-            )";
+        $command = "openssl x509 -in $in -inform $inForm -noout";
 
         $process = new Process($command);
         $process->run();
 
-        return $process->isSuccessful();
+        if (!$process->isSuccessful()) {
+            return false;
+        }
+
+        $command = "openssl rsa -in $in -inform $inForm -passin pass: -check -noout";
+
+        $process = new Process($command);
+        $process->run();
+
+        $badPasswordRead = false !== strpos($process->getErrorOutput(), ':bad password read:');
+
+        if ($process->isSuccessful() || $badPasswordRead) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -69,6 +77,8 @@ class PublicKeyFile extends CryptoFile
 
     /**
      * @return string
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getSubject()
     {
@@ -85,6 +95,8 @@ class PublicKeyFile extends CryptoFile
 
     /**
      * @return string
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getIssuer()
     {
@@ -101,6 +113,8 @@ class PublicKeyFile extends CryptoFile
 
     /**
      * @return \DateTime
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getNotBefore()
     {
@@ -117,6 +131,8 @@ class PublicKeyFile extends CryptoFile
 
     /**
      * @return \DateTime
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getNotAfter()
     {
@@ -136,15 +152,18 @@ class PublicKeyFile extends CryptoFile
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile
      *
-     * @throws \InvalidArgumentException
+     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function convertFormat($format)
     {
+        $format = strtolower($format);
+
         if (!defined('DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile::FORMAT_' . strtoupper($format))) {
-            throw new \InvalidArgumentException(sprintf('Invalid format "%s".', $format));
+            throw new FormatNotValidException($format);
         }
 
-        if ($this->getFormat() === strtolower($format)) {
+        if ($this->getFormat() === $format) {
             return $this;
         }
 
@@ -154,7 +173,8 @@ class PublicKeyFile extends CryptoFile
 
         $command = "
             openssl x509 -in $in -inform $inForm -out $in~ -outform $outForm &&
-            mv $in~ $in";
+            mv $in~ $in ||
+            rm $in~";
 
         $process = new Process($command);
         $process->mustRun();

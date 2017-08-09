@@ -20,6 +20,8 @@
 
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
+use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException;
+use DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\CryptoFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
@@ -43,20 +45,27 @@ class PrivateKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        // issue: `openssl rsa` can't read PKCS#8 DER format with passphrase -> use `openssl pkcs8` as fallback
-        $command = "
-            (
-                error=$(openssl rsa -in $in -inform $inForm -passin pass: -check -noout 2>&1 >/dev/null) ||
-                echo \"\$error\" | grep --regexp ':bad password read:' ||
-                error=$(openssl pkcs8 -in $in -inform $inForm -passin pass: 2>&1 >/dev/null) ||
-                echo \"\$error\" | grep --regexp ':bad decrypt:'
-            ) &&
-            ! openssl x509 -in $in -inform $inForm -noout";
+        $command = "openssl rsa -in $in -inform $inForm -passin pass: -check -noout";
 
         $process = new Process($command);
         $process->run();
 
-        return $process->isSuccessful();
+        $badPasswordRead = false !== strpos($process->getErrorOutput(), ':bad password read:');
+
+        if (!$process->isSuccessful() && !$badPasswordRead) {
+            return false;
+        }
+
+        $command = "openssl x509 -in $in -inform $inForm -noout";
+
+        $process = new Process($command);
+        $process->run();
+
+        if ($process->isSuccessful()) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -68,45 +77,46 @@ class PrivateKeyFile extends CryptoFile
     }
 
     /**
-     * @param string      $format
-     * @param string|null $password
+     * @param string $format
+     * @param string|null $passPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
      *
-     * @throws \InvalidArgumentException
+     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException
+     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function convertFormat($format, $password = null)
+    public function convertFormat($format, $passPhrase = null)
     {
+        $format = strtolower($format);
+
         if (!defined('DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile::FORMAT_' . strtoupper($format))) {
-            throw new \InvalidArgumentException(sprintf('Invalid format "%s".', $format));
+            throw new FormatNotValidException($format);
         }
 
-        if ($this->getFormat() === strtolower($format)) {
+        if ($this->getFormat() === $format) {
             return $this;
+        }
+
+        if ('' === $passPhrase) {
+            throw new PrivateKeyPassPhraseEmptyException();
         }
 
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
         $outForm = escapeshellarg($format);
-        $pass = escapeshellarg($password);
+        $pass = escapeshellarg($passPhrase);
 
-        if (null !== $password) {
-            $rsaPassOut = "-passout pass:$password -des3";
-            $pkcs8PassIn = "-passin pass:$password";
+        if (null !== $passPhrase) {
+            $rsaPassOut = "-passout pass:$pass -des3";
         } else {
             $rsaPassOut = '';
-            $pkcs8PassIn = '-nocrypt';
         }
 
-        // issue: `openssl rsa` can't read PKCS#8 DER format with passphrase -> use `openssl pkcs8` as fallback
-        // issue: `openssl pkcs8` can't output RSA key with passphrase -> pipe to `openssl rsa`
         $command = "
-            (
-                openssl rsa -in $in -inform $inForm -out $in~ -outform $outForm -passin pass:$pass $rsaPassOut ||
-                openssl pkcs8 -in $in -inform $inForm -outform $outForm $pkcs8PassIn |
-                openssl rsa -out $in~ $rsaPassOut
-            ) &&
-            mv $in~ $in";
+            openssl rsa -in $in -inform $inForm -passin pass:$pass -out $in~ -outform $outForm $rsaPassOut &&
+            mv $in~ $in ||
+            rm $in~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -120,16 +130,12 @@ class PrivateKeyFile extends CryptoFile
     /**
      * @return bool
      */
-    public function hasPassphrase()
+    public function hasPassPhrase()
     {
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        // issue: `openssl rsa` can't read PKCS#8 DER format with passphrase -> use `openssl pkcs8` as fallback
-        $command = "
-            openssl rsa -in $in -inform $inForm -passin pass: -check -noout ||
-            openssl pkcs8 -in $in -inform $inForm -passin pass: ||
-            openssl pkcs8 -in $in -inform $inForm -nocrypt";
+        $command = "openssl rsa -in $in -inform $inForm -passin pass: -check -noout";
 
         $process = new Process($command);
         $process->run();

@@ -20,6 +20,7 @@
 
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
+use DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\CryptoFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
@@ -41,53 +42,54 @@ class KeystoreFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        $command = "openssl pkcs12 -in $in -passin pass:";
+        $command = "openssl pkcs12 -in $in -passin pass: -noout";
 
         $process = new Process($command);
         $process->run();
 
         $invalidPassword = false !== strpos($process->getErrorOutput(), 'invalid password');
 
-        return $process->isSuccessful() || $invalidPassword;
+        if (!$process->isSuccessful() && !$invalidPassword) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * @param string $pathname
-     * @param string $keystorePassword
-     * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile  $publicKeyFile
+     * @param string $keystorePassPhrase
+     * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile $publicKeyFile
      * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile $privateKeyFile
-     * @param string|null $privateKeyPassword
+     * @param string|null $privateKeyPassPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile
+     *
+     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public static function create($pathname, $keystorePassword, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, $privateKeyPassword = null)
+    public static function create($pathname, $keystorePassPhrase, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, $privateKeyPassPhrase = null)
     {
+        if ('' === $privateKeyPassPhrase) {
+            throw new PrivateKeyPassPhraseEmptyException();
+        }
+
         $out = escapeshellarg($pathname);
-        $keystorePass = escapeshellarg($keystorePassword);
+        $keystorePass = escapeshellarg($keystorePassPhrase);
         $publicKeyIn = escapeshellarg($publicKeyFile->getPathname());
         $publicKeyInForm = escapeshellarg($publicKeyFile->getFormat());
         $privateKeyIn = escapeshellarg($privateKeyFile->getPathname());
         $privateKeyInForm = escapeshellarg($privateKeyFile->getFormat());
-        $privateKeyPass = escapeshellarg($privateKeyPassword);
+        $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
 
-        if (null !== $privateKeyPassword) {
-            $rsaPassOut = "-passout pass:$privateKeyPass -des3";
-            $pkcs8PassInNoCrypt = "-passin pass:$privateKeyPass";
-        } else {
-            $rsaPassOut = '';
-            $pkcs8PassInNoCrypt = ' -nocrypt';
-        }
-
-        // issue: `openssl pkcs12` requires key first for piped input
         $command = "
-            (
-                openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass $rsaPassOut ||
-                openssl pkcs8 -in $privateKeyIn -inform $privateKeyInForm $pkcs8PassInNoCrypt |
-                openssl rsa $rsaPassOut
+            {
+                openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass -passout pass:pipe -des3
                 openssl x509 -in $publicKeyIn -inform $publicKeyInForm
-            ) |
-            openssl pkcs12 -passin pass:$privateKeyPass -out $out~ -passout pass:$keystorePass -export &&
-            mv $out~ $out";
+            } |
+            openssl pkcs12 -passin pass:pipe -out $out~ -passout pass:$keystorePass -export &&
+            mv $out~ $out ||
+            rm $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -97,24 +99,36 @@ class KeystoreFile extends CryptoFile
 
     /**
      * @param string $pathname
-     * @param string $keystorePassword
+     * @param string $keystorePassPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPem($pathname, $keystorePassword)
+    public function getPem($pathname, $keystorePassPhrase)
     {
+        // if the keystore pass phrase is an empty string, the outputted private key will not contain a pass phrase
+        $privateKeyPassPhrase = '' !== $keystorePassPhrase ? $keystorePassPhrase : null;
+
         $in = escapeshellarg($this->getPathname());
         $out = escapeshellarg($pathname);
-        $keystorePass = escapeshellarg($keystorePassword);
+        $keystorePass = escapeshellarg($keystorePassPhrase);
+
+        if (null !== $privateKeyPassPhrase) {
+            $rsaPassOut = "-passout pass:$privateKeyPassPhrase -des3";
+        } else {
+            $rsaPassOut = '';
+        }
 
         $command = "
-            (
+            {
                 openssl pkcs12 -in $in -passin pass:$keystorePass -nokeys |
                 openssl x509
                 openssl pkcs12 -in $in -passin pass:$keystorePass -nocerts -passout pass:pipe |
-                openssl rsa -passin pass:pipe -passout pass:$keystorePass -des3
-            ) > $out~ &&
-            mv $out~ $out";
+                openssl rsa -passin pass:pipe $rsaPassOut
+            } > $out~ &&
+            mv $out~ $out ||
+            rm $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -126,15 +140,17 @@ class KeystoreFile extends CryptoFile
 
     /**
      * @param string $pathname
-     * @param string $keystorePassword
+     * @param string $keystorePassPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPublicKey($pathname, $keystorePassword)
+    public function getPublicKey($pathname, $keystorePassPhrase)
     {
         $in = escapeshellarg($this->getPathname());
         $out = escapeshellarg($pathname);
-        $keystorePass = escapeshellarg($keystorePassword);
+        $keystorePass = escapeshellarg($keystorePassPhrase);
 
         $command = "
             openssl pkcs12 -in $in -passin pass:$keystorePass -nokeys |
@@ -151,19 +167,30 @@ class KeystoreFile extends CryptoFile
 
     /**
      * @param string $pathname
-     * @param string $keystorePassword
+     * @param string $keystorePassPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPrivateKey($pathname, $keystorePassword)
+    public function getPrivateKey($pathname, $keystorePassPhrase)
     {
+        // if the keystore pass phrase is an empty string, the outputted private key will not contain a pass phrase
+        $privateKeyPassPhrase = '' !== $keystorePassPhrase ? $keystorePassPhrase : null;
+
         $in = escapeshellarg($this->getPathname());
         $out = escapeshellarg($pathname);
-        $keystorePass = escapeshellarg($keystorePassword);
+        $keystorePass = escapeshellarg($keystorePassPhrase);
+
+        if (null !== $privateKeyPassPhrase) {
+            $rsaPassOut = "-passout pass:$privateKeyPassPhrase -des3";
+        } else {
+            $rsaPassOut = '';
+        }
 
         $command = "
             openssl pkcs12 -in $in -passin pass:$keystorePass -nocerts -passout pass:pipe |
-            openssl rsa -passin pass:pipe -out $out~ -passout pass:$keystorePass -des3 &&
+            openssl rsa -passin pass:pipe -out $out~ $rsaPassOut &&
             mv $out~ $out";
 
         $process = new Process($command);
@@ -175,14 +202,16 @@ class KeystoreFile extends CryptoFile
     }
 
     /**
-     * @param string $keystorePassword
+     * @param string $keystorePassPhrase
      *
      * @return string
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getSubject($keystorePassword)
+    public function getSubject($keystorePassPhrase)
     {
         $in = escapeshellarg($this->getPathname());
-        $keystorePass = escapeshellarg($keystorePassword);
+        $keystorePass = escapeshellarg($keystorePassPhrase);
 
         $command = "
             openssl pkcs12 -in $in -passin pass:$keystorePass -nokeys |
@@ -195,14 +224,16 @@ class KeystoreFile extends CryptoFile
     }
 
     /**
-     * @param string $keystorePassword
+     * @param string $keystorePassPhrase
      *
      * @return string
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getIssuer($keystorePassword)
+    public function getIssuer($keystorePassPhrase)
     {
         $in = escapeshellarg($this->getPathname());
-        $keystorePass = escapeshellarg($keystorePassword);
+        $keystorePass = escapeshellarg($keystorePassPhrase);
 
         $command = "
             openssl pkcs12 -in $in -passin pass:$keystorePass -nokeys |
@@ -215,14 +246,16 @@ class KeystoreFile extends CryptoFile
     }
 
     /**
-     * @param string $keystorePassword
+     * @param string $keystorePassPhrase
      *
      * @return \DateTime
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getNotBefore($keystorePassword)
+    public function getNotBefore($keystorePassPhrase)
     {
         $in = escapeshellarg($this->getPathname());
-        $keystorePass = escapeshellarg($keystorePassword);
+        $keystorePass = escapeshellarg($keystorePassPhrase);
 
         $command = "
             openssl pkcs12 -in $in -passin pass:$keystorePass -nokeys |
@@ -235,14 +268,16 @@ class KeystoreFile extends CryptoFile
     }
 
     /**
-     * @param string $keystorePassword
+     * @param string $keystorePassPhrase
      *
      * @return \DateTime
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getNotAfter($keystorePassword)
+    public function getNotAfter($keystorePassPhrase)
     {
         $in = escapeshellarg($this->getPathname());
-        $keystorePass = escapeshellarg($keystorePassword);
+        $keystorePass = escapeshellarg($keystorePassPhrase);
 
         $command = "
             openssl pkcs12 -in $in -passin pass:$keystorePass -nokeys |

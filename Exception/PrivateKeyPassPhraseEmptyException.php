@@ -20,20 +20,15 @@
 
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Exception;
 
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-
 /**
  * @author Raymond Schouten
  *
  * @since 1.0
  */
-class FileNotValidException extends FileException
+class PrivateKeyPassPhraseEmptyException extends \InvalidArgumentException
 {
-    /**
-     * @param string $path
-     */
-    public function __construct($path)
+    public function __construct()
     {
-        parent::__construct(sprintf('The file "%s" is not valid.', $path));
+        parent::__construct('The private key pass phrase can not be an empty string.');
     }
 }

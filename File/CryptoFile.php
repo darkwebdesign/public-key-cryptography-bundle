@@ -33,17 +33,15 @@ abstract class CryptoFile extends File
 {
     /**
      * @param string $path
-     * @param bool $checkPath
-     * @param bool $validateFile
      *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException
      */
-    public function __construct($path, $checkPath = true, $validateFile = true)
+    public function __construct($path)
     {
-        parent::__construct($path, $checkPath);
+        parent::__construct($path);
 
-        if ($validateFile && !$this->validate()) {
+        if (!$this->validate()) {
             throw new FileNotValidException($path);
         }
     }

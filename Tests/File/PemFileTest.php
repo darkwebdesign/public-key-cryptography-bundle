@@ -28,6 +28,7 @@ use PHPUnit\Framework\TestCase;
 class PemFileTest extends TestCase
 {
     const TEST_PASSWORD = 'test';
+    const TEST_EMPTYPASSWORD = '';
     const TEST_SUBJECT = '/C=DE/ST=Bavaria/L=Munich/O=MIT-xperts GmbH/OU=TEST CA/CN=testbox.mit-xperts.com/emailAddress=info@mit-xperts.com';
     const TEST_ISSUER = '/C=DE/ST=Bavaria/L=Munich/O=MIT-xperts GmbH/OU=HBBTV-DEMO-CA/CN=itv.mit-xperts.com/emailAddress=info@mit-xperts.com';
     const TEST_NOT_BEFORE = '2012-09-23 17:21:33';
@@ -51,7 +52,7 @@ class PemFileTest extends TestCase
     /**
      * @param string $pathname
      *
-     * @dataProvider providerPathnames
+     * @dataProvider providerPems
      */
     public function testNewInstance($pathname)
     {
@@ -63,11 +64,11 @@ class PemFileTest extends TestCase
     /**
      * @param string $pathname
      *
-     * @dataProvider providerPathnamesNotPemFile
+     * @dataProvider providerNotPems
      *
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
-    public function testNewInstanceNotPemFile($pathname)
+    public function testNewInstanceNotPem($pathname)
     {
         copy($pathname, $this->file);
 
@@ -77,41 +78,64 @@ class PemFileTest extends TestCase
     /**
      * @param string $publicKeyPathname
      * @param string $privateKeyPathname
-     * @param string|null $privateKeyPassword
+     * @param string|null $privateKeyPassPhrase
      *
      * @dataProvider providerCreate
      */
-    public function testCreate($publicKeyPathname, $privateKeyPathname, $privateKeyPassword = null)
+    public function testCreate($publicKeyPathname, $privateKeyPathname, $privateKeyPassPhrase = null)
     {
         $publicKeyFile = new PublicKeyFile($publicKeyPathname);
         $privateKeyFile = new PrivateKeyFile($privateKeyPathname);
 
-        $pemFile = PemFile::create($this->file, $publicKeyFile, $privateKeyFile, $privateKeyPassword);
+        $pemFile = PemFile::create($this->file, $publicKeyFile, $privateKeyFile, $privateKeyPassPhrase);
 
         $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile', $pemFile);
     }
 
     /**
-     * @param string $pathname
-     * @param string|null $privateKeyPassword
-     *
-     * @dataProvider providerPathnamesAndPasswords
+     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      */
-    public function testGetKeystore($pathname, $privateKeyPassword = null)
+    public function testCreateEmptyPassPhrase()
+    {
+        $publicKeyFile = new PublicKeyFile(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt');
+        $privateKeyFile = new PrivateKeyFile(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key');
+
+        PemFile::create($this->file, $publicKeyFile, $privateKeyFile, static::TEST_EMPTYPASSWORD);
+    }
+
+    /**
+     * @param string $pathname
+     * @param string|null $privateKeyPassPhrase
+     *
+     * @dataProvider providerPemsAndPassPhrases
+     */
+    public function testGetKeystore($pathname, $privateKeyPassPhrase = null)
     {
         copy($pathname, $this->file);
 
         $pemFile = new PemFile($this->file);
 
-        $keystoreFile = $pemFile->getKeystore($pemFile->getPathname(), static::TEST_PASSWORD, $privateKeyPassword);
+        $keystoreFile = $pemFile->getKeystore($pemFile->getPathname(), static::TEST_PASSWORD, $privateKeyPassPhrase);
 
         $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile', $keystoreFile);
     }
 
     /**
+     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     */
+    public function testGetKeystoreEmptyPassPhrase()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
+
+        $pemFile = new PemFile($this->file);
+
+        $pemFile->getKeystore($pemFile->getPathname(), static::TEST_PASSWORD, static::TEST_EMPTYPASSWORD);
+    }
+
+    /**
      * @param string $pathname
      *
-     * @dataProvider providerPathnames
+     * @dataProvider providerPems
      */
     public function testGetPublicKey($pathname)
     {
@@ -126,25 +150,37 @@ class PemFileTest extends TestCase
 
     /**
      * @param string $pathname
-     * @param string|null $privateKeyPassword
+     * @param string|null $privateKeyPassPhrase
      *
-     * @dataProvider providerPathnamesAndPasswords
+     * @dataProvider providerPemsAndPassPhrases
      */
-    public function testGetPrivateKey($pathname, $privateKeyPassword = null)
+    public function testGetPrivateKey($pathname, $privateKeyPassPhrase = null)
     {
         copy($pathname, $this->file);
 
         $pemFile = new PemFile($this->file);
 
-        $privateKeyFile = $pemFile->getPrivateKey($pemFile->getPathname(), $privateKeyPassword);
+        $privateKeyFile = $pemFile->getPrivateKey($pemFile->getPathname(), $privateKeyPassPhrase);
 
         $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile', $privateKeyFile);
     }
 
     /**
+     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     */
+    public function testGetPrivateKeyEmptyPassPhrase()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
+
+        $pemFile = new PemFile($this->file);
+
+        $pemFile->getPrivateKey($pemFile->getPathname(), static::TEST_EMPTYPASSWORD);
+    }
+
+    /**
      * @param string $pathname
      *
-     * @dataProvider providerPathnames
+     * @dataProvider providerPems
      */
     public function testGetSubject($pathname)
     {
@@ -152,15 +188,13 @@ class PemFileTest extends TestCase
 
         $pemFile = new PemFile($this->file);
 
-        $subject = $pemFile->getSubject();
-
-        $this->assertSame(static::TEST_SUBJECT, $subject);
+        $this->assertSame(static::TEST_SUBJECT, $pemFile->getSubject());
     }
 
     /**
      * @param string $pathname
      *
-     * @dataProvider providerPathnames
+     * @dataProvider providerPems
      */
     public function testGetIssuer($pathname)
     {
@@ -168,15 +202,13 @@ class PemFileTest extends TestCase
 
         $pemFile = new PemFile($this->file);
 
-        $issuer = $pemFile->getIssuer();
-
-        $this->assertSame(static::TEST_ISSUER, $issuer);
+        $this->assertSame(static::TEST_ISSUER, $pemFile->getIssuer());
     }
 
     /**
      * @param string $pathname
      *
-     * @dataProvider providerPathnames
+     * @dataProvider providerPems
      */
     public function testGetNotBefore($pathname)
     {
@@ -193,7 +225,7 @@ class PemFileTest extends TestCase
     /**
      * @param string $pathname
      *
-     * @dataProvider providerPathnames
+     * @dataProvider providerPems
      */
     public function testGetNotAfter($pathname)
     {
@@ -209,24 +241,22 @@ class PemFileTest extends TestCase
 
     /**
      * @param string $pathname
-     * @param string|null $privateKeyPassword
+     * @param string|null $privateKeyPassPhrase
      *
-     * @dataProvider providerPathnamesAndPasswords
+     * @dataProvider providerPemsAndPassPhrases
      */
-    public function testHasPassphrase($pathname, $privateKeyPassword = null)
+    public function testHasPassPhrase($pathname, $privateKeyPassPhrase = null)
     {
         copy($pathname, $this->file);
 
         $pemFile = new PemFile($this->file);
 
-        $hasPassphrase = $pemFile->hasPassphrase();
-
-        $this->assertSame(null !== $privateKeyPassword, $hasPassphrase);
+        $this->assertSame(null !== $privateKeyPassPhrase, $pemFile->hasPassphrase());
     }
 
     public function testMove()
     {
-        copy(__DIR__ . '/../Fixtures/Certificates/pem-nopass.pem', $this->file);
+        copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
 
@@ -238,7 +268,7 @@ class PemFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerPathnames()
+    public function providerPems()
     {
         return array(
             array(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem'),
@@ -249,7 +279,7 @@ class PemFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerPathnamesAndPasswords()
+    public function providerPemsAndPassPhrases()
     {
         return array(
             array(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', static::TEST_PASSWORD),
@@ -260,10 +290,11 @@ class PemFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerPathnamesNotPemFile()
+    public function providerNotPems()
     {
         return array(
             array(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12'),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs12-emptypass.p12'),
             array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt'),
             array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt'),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key'),

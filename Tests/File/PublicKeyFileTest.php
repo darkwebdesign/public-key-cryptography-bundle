@@ -49,7 +49,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * @param string $pathname
      *
-     * @dataProvider providerPathnames
+     * @dataProvider providerPublicKeys
      */
     public function testNewInstance($pathname)
     {
@@ -61,7 +61,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * @param string $pathname
      *
-     * @dataProvider providerPathnamesNotPublicKey
+     * @dataProvider providerNotPublicKeys
      *
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
@@ -74,8 +74,23 @@ class PublicKeyFileTest extends TestCase
 
     /**
      * @param string $pathname
+     * @param string $format
      *
-     * @dataProvider providerPathnames
+     * @dataProvider providerPublicKeysAndFormats
+     */
+    public function testGetFormat($pathname, $format)
+    {
+        copy($pathname, $this->file);
+
+        $publicKeyFile = new PublicKeyFile($this->file);
+
+        $this->assertSame($format, $publicKeyFile->getFormat());
+    }
+
+    /**
+     * @param string $pathname
+     *
+     * @dataProvider providerPublicKeys
      */
     public function testGetSubject($pathname)
     {
@@ -83,15 +98,13 @@ class PublicKeyFileTest extends TestCase
 
         $publicKeyFile = new PublicKeyFile($this->file);
 
-        $subject = $publicKeyFile->getSubject();
-
-        $this->assertSame(static::TEST_SUBJECT, $subject);
+        $this->assertSame(static::TEST_SUBJECT, $publicKeyFile->getSubject());
     }
 
     /**
      * @param string $pathname
      *
-     * @dataProvider providerPathnames
+     * @dataProvider providerPublicKeys
      */
     public function testGetIssuer($pathname)
     {
@@ -99,15 +112,13 @@ class PublicKeyFileTest extends TestCase
 
         $publicKeyFile = new PublicKeyFile($this->file);
 
-        $issuer = $publicKeyFile->getIssuer();
-
-        $this->assertSame(static::TEST_ISSUER, $issuer);
+        $this->assertSame(static::TEST_ISSUER, $publicKeyFile->getIssuer());
     }
 
     /**
      * @param string $pathname
      *
-     * @dataProvider providerPathnames
+     * @dataProvider providerPublicKeys
      */
     public function testGetNotBefore($pathname)
     {
@@ -124,7 +135,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * @param string $pathname
      *
-     * @dataProvider providerPathnames
+     * @dataProvider providerPublicKeys
      */
     public function testGetNotAfter($pathname)
     {
@@ -142,7 +153,7 @@ class PublicKeyFileTest extends TestCase
      * @param string $pathname
      * @param string $format
      *
-     * @dataProvider providerPathnamesAndFormats
+     * @dataProvider providerConvertFormat
      */
     public function testConvertFormat($pathname, $format)
     {
@@ -157,7 +168,7 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException
      */
     public function testConvertFormatInvalidFormat()
     {
@@ -165,9 +176,7 @@ class PublicKeyFileTest extends TestCase
 
         $publicKeyFile = new PublicKeyFile($this->file);
 
-        $format = 'invalid-format';
-
-        $publicKeyFile->convertFormat($format);
+        $publicKeyFile->convertFormat('invalid-format');
     }
 
     public function testMove()
@@ -184,7 +193,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerPathnames()
+    public function providerPublicKeys()
     {
         return array(
             array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt'),
@@ -195,23 +204,11 @@ class PublicKeyFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerPathnamesAndFormats()
-    {
-        return array(
-            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', PublicKeyFile::FORMAT_PEM),
-            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', PublicKeyFile::FORMAT_DER),
-            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', PublicKeyFile::FORMAT_PEM),
-            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', PublicKeyFile::FORMAT_DER),
-        );
-    }
-
-    /**
-     * return array[]
-     */
-    public function providerPathnamesNotPublicKey()
+    public function providerNotPublicKeys()
     {
         return array(
             array(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12'),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs12-emptypass.p12'),
             array(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem'),
             array(__DIR__ . '/../Fixtures/Certificates/pem-nopass.pem'),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key'),
@@ -221,6 +218,30 @@ class PublicKeyFileTest extends TestCase
             array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key'),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'),
+        );
+    }
+
+    /**
+     * return array[]
+     */
+    public function providerPublicKeysAndFormats()
+    {
+        return array(
+            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', PublicKeyFile::FORMAT_PEM),
+            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', PublicKeyFile::FORMAT_DER),
+        );
+    }
+
+    /**
+     * @return array[]
+     */
+    public function providerConvertFormat()
+    {
+        return array(
+            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', PublicKeyFile::FORMAT_PEM),
+            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', PublicKeyFile::FORMAT_DER),
+            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', PublicKeyFile::FORMAT_PEM),
+            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', PublicKeyFile::FORMAT_DER),
         );
     }
 }

@@ -20,6 +20,7 @@
 
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
+use DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\CryptoFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
@@ -40,55 +41,66 @@ class PemFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        // issue: `openssl rsa` can't read PKCS#8 DER format with passphrase -> use `openssl pkcs8` as fallback
-        $command = "
-            openssl x509 -in $in -noout &&
-            (
-                error=$(openssl rsa -in $in -passin pass: -check -noout 2>&1 >/dev/null) ||
-                echo \"\$error\" | grep --regexp ':bad password read:' ||
-                error=$(openssl pkcs8 -in $in -passin pass: 2>&1 >/dev/null) ||
-                echo \"\$error\" | grep --regexp ':bad decrypt:'
-            )";
+        $command = "openssl x509 -in $in -noout";
 
         $process = new Process($command);
         $process->run();
 
-        return $process->isSuccessful();
+        if (!$process->isSuccessful()) {
+            return false;
+        }
+
+        $command = "openssl rsa -in $in -passin pass: -check -noout";
+
+        $process = new Process($command);
+        $process->run();
+
+        $badPasswordRead = false !== strpos($process->getErrorOutput(), ':bad password read:');
+
+        if (!$process->isSuccessful() && !$badPasswordRead) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
-     * @param string                                                         $pathname
+     * @param string $pathname
      * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile  $publicKeyFile
      * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile $privateKeyFile
-     * @param string|null                                                    $privateKeyPassword
+     * @param string|null $privateKeyPassPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile
+     *
+     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public static function create($pathname, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, $privateKeyPassword = null)
+    public static function create($pathname, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, $privateKeyPassPhrase = null)
     {
+        if ('' === $privateKeyPassPhrase) {
+            throw new PrivateKeyPassPhraseEmptyException();
+        }
+
         $out = escapeshellarg($pathname);
         $publicKeyIn = escapeshellarg($publicKeyFile->getPathname());
         $publicKeyInForm = escapeshellarg($publicKeyFile->getFormat());
         $privateKeyIn = escapeshellarg($privateKeyFile->getPathname());
         $privateKeyInForm = escapeshellarg($privateKeyFile->getFormat());
-        $privateKeyPass = escapeshellarg($privateKeyPassword);
+        $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
 
-        if (null !== $privateKeyPassword) {
+        if (null !== $privateKeyPassPhrase) {
             $rsaPassOut = "-passout pass:$privateKeyPass -des3";
         } else {
             $rsaPassOut = '';
         }
 
-        // issue: `openssl rsa` can't read PKCS#8 DER format with passphrase -> use `openssl pkcs8` as fallback
-        // issue: `openssl pkcs8` can't output RSA key with passphrase -> pipe to `openssl rsa`
         $command = "
-            (
+            {
                 openssl x509 -in $publicKeyIn -inform $publicKeyInForm
-                openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass $rsaPassOut ||
-                openssl pkcs8 -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass |
-                openssl rsa $rsaPassOut
-            ) > $out~ &&
-            mv $out~ $out";
+                openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass $rsaPassOut
+            } > $out~ &&
+            mv $out~ $out ||
+            rm $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -99,22 +111,30 @@ class PemFile extends CryptoFile
     }
 
     /**
-     * @param string      $pathname
-     * @param string      $keystorePassword
-     * @param string|null $privateKeyPassword
+     * @param string $pathname
+     * @param string $keystorePassPhrase
+     * @param string|null $privateKeyPassPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile
+     *
+     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getKeystore($pathname, $keystorePassword, $privateKeyPassword = null)
+    public function getKeystore($pathname, $keystorePassPhrase, $privateKeyPassPhrase = null)
     {
+        if ('' === $privateKeyPassPhrase) {
+            throw new PrivateKeyPassPhraseEmptyException();
+        }
+
         $in = escapeshellarg($this->getPathname());
         $out = escapeshellarg($pathname);
-        $keystorePass = escapeshellarg($keystorePassword);
-        $privateKeyPass = escapeshellarg($privateKeyPassword);
+        $keystorePass = escapeshellarg($keystorePassPhrase);
+        $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
 
         $command = "
             openssl pkcs12 -in $in -passin pass:$privateKeyPass -out $out~ -passout pass:$keystorePass -export &&
-            mv $out~ $out";
+            mv $out~ $out ||
+            rm $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -128,6 +148,8 @@ class PemFile extends CryptoFile
      * @param string $pathname
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getPublicKey($pathname)
     {
@@ -136,7 +158,8 @@ class PemFile extends CryptoFile
 
         $command = "
             openssl x509 -in $in -out $out~ &&
-            mv $out~ $out";
+            mv $out~ $out ||
+            rm $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -147,18 +170,25 @@ class PemFile extends CryptoFile
     }
 
     /**
-     * @param string      $pathname
-     * @param string|null $privateKeyPassword
+     * @param string $pathname
+     * @param string|null $privateKeyPassPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
+     *
+     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPrivateKey($pathname, $privateKeyPassword = null)
+    public function getPrivateKey($pathname, $privateKeyPassPhrase = null)
     {
+        if ('' === $privateKeyPassPhrase) {
+            throw new PrivateKeyPassPhraseEmptyException();
+        }
+
         $in = escapeshellarg($this->getPathname());
         $out = escapeshellarg($pathname);
-        $privateKeyPass = escapeshellarg($privateKeyPassword);
+        $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
 
-        if (null !== $privateKeyPassword) {
+        if (null !== $privateKeyPassPhrase) {
             $rsaPassOut = "-passout pass:$privateKeyPass -des3";
         } else {
             $rsaPassOut = '';
@@ -166,7 +196,8 @@ class PemFile extends CryptoFile
 
         $command = "
             openssl rsa -in $in -passin pass:$privateKeyPass -out $out~ $rsaPassOut &&
-            mv $out~ $out";
+            mv $out~ $out ||
+            rm $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -178,6 +209,8 @@ class PemFile extends CryptoFile
 
     /**
      * @return string
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getSubject()
     {
@@ -193,6 +226,8 @@ class PemFile extends CryptoFile
 
     /**
      * @return string
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getIssuer()
     {
@@ -208,6 +243,8 @@ class PemFile extends CryptoFile
 
     /**
      * @return \DateTime
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getNotBefore()
     {
@@ -223,6 +260,8 @@ class PemFile extends CryptoFile
 
     /**
      * @return \DateTime
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getNotAfter()
     {
@@ -239,15 +278,11 @@ class PemFile extends CryptoFile
     /**
      * @return bool
      */
-    public function hasPassphrase()
+    public function hasPassPhrase()
     {
         $in = escapeshellarg($this->getPathname());
 
-        // issue: `openssl rsa` can't read PKCS#8 DER format with passphrase -> use `openssl pkcs8` as fallback
-        $command = "
-            openssl rsa -in $in -passin pass: -check -noout ||
-            openssl pkcs8 -in $in -passin pass: ||
-            openssl pkcs8 -in $in -nocrypt";
+        $command = "openssl rsa -in $in -passin pass: -check -noout";
 
         $process = new Process($command);
         $process->run();

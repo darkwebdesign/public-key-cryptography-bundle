@@ -34,14 +34,19 @@ Symfony applications.
 
 * Converts public/private key format (PEM/DER).
 
-### Passphrase management
+### Pass phrase management
 
 * Adds/removes passphrase from PEM/private key.
 * Changes passphrase of keystore/PEM/private key.
 
-## Dependencies
+## Known issues
 
-* `openssl` and `keytool` shell commands
+* `openssl rsa` (at least 0.9.8zh) isn't able to read PKCS#8 private keys in DER format.
+* `openssl rsa` (at least 1.0.1e-fips) isn't able to read PKCS#8 private keys in DER format containing a pass phrase.
+* `openssl rsa` (at least 0.9.8zh and 1.0.1e-fips) isn't able to output RSA private keys in DER format with a pass phrase;
+  private key will be outputted, but without a pass phrase.
+
+According to the OpenSSL Software Foundation, the 0.9.8, 1.0.0 and 1.0.1 versions are out of support and should not be used.
 
 ## Installing via Composer
 
@@ -52,6 +57,10 @@ composer require darkwebdesign/public-key-cryptography-bundle
 ```bash
 composer install
 ```
+
+## Dependencies
+
+* `openssl`, `mv` and `rm` shell commands
 
 ## License
 
