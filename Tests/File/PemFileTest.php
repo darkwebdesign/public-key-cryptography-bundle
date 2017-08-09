@@ -27,8 +27,8 @@ use PHPUnit\Framework\TestCase;
 
 class PemFileTest extends TestCase
 {
-    const TEST_PASSWORD = 'test';
-    const TEST_EMPTYPASSWORD = '';
+    const TEST_PASSPHRASE = 'test';
+    const TEST_EMPTYPASSPHRASE = '';
     const TEST_SUBJECT = '/C=DE/ST=Bavaria/L=Munich/O=MIT-xperts GmbH/OU=TEST CA/CN=testbox.mit-xperts.com/emailAddress=info@mit-xperts.com';
     const TEST_ISSUER = '/C=DE/ST=Bavaria/L=Munich/O=MIT-xperts GmbH/OU=HBBTV-DEMO-CA/CN=itv.mit-xperts.com/emailAddress=info@mit-xperts.com';
     const TEST_NOT_BEFORE = '2012-09-23 17:21:33';
@@ -100,7 +100,7 @@ class PemFileTest extends TestCase
         $publicKeyFile = new PublicKeyFile(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt');
         $privateKeyFile = new PrivateKeyFile(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key');
 
-        PemFile::create($this->file, $publicKeyFile, $privateKeyFile, static::TEST_EMPTYPASSWORD);
+        PemFile::create($this->file, $publicKeyFile, $privateKeyFile, static::TEST_EMPTYPASSPHRASE);
     }
 
     /**
@@ -115,7 +115,7 @@ class PemFileTest extends TestCase
 
         $pemFile = new PemFile($this->file);
 
-        $keystoreFile = $pemFile->getKeystore($pemFile->getPathname(), static::TEST_PASSWORD, $privateKeyPassPhrase);
+        $keystoreFile = $pemFile->getKeystore($pemFile->getPathname(), static::TEST_PASSPHRASE, $privateKeyPassPhrase);
 
         $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile', $keystoreFile);
     }
@@ -129,7 +129,7 @@ class PemFileTest extends TestCase
 
         $pemFile = new PemFile($this->file);
 
-        $pemFile->getKeystore($pemFile->getPathname(), static::TEST_PASSWORD, static::TEST_EMPTYPASSWORD);
+        $pemFile->getKeystore($pemFile->getPathname(), static::TEST_PASSPHRASE, static::TEST_EMPTYPASSPHRASE);
     }
 
     /**
@@ -174,7 +174,7 @@ class PemFileTest extends TestCase
 
         $pemFile = new PemFile($this->file);
 
-        $pemFile->getPrivateKey($pemFile->getPathname(), static::TEST_EMPTYPASSWORD);
+        $pemFile->getPrivateKey($pemFile->getPathname(), static::TEST_EMPTYPASSPHRASE);
     }
 
     /**
@@ -254,6 +254,102 @@ class PemFileTest extends TestCase
         $this->assertSame(null !== $privateKeyPassPhrase, $pemFile->hasPassphrase());
     }
 
+    /**
+     * @param string $pathname
+     *
+     * @dataProvider providerPemsHavingPassPhrases
+     */
+    public function testVerifyPassPhrase($pathname)
+    {
+        copy($pathname, $this->file);
+
+        $pemFile = new PemFile($this->file);
+
+        $verified = $pemFile->verifyPassPhrase(static::TEST_PASSPHRASE);
+
+        $this->assertTrue($verified);
+
+        $verified = $pemFile->verifyPassPhrase('invalid-passphrase');
+
+        $this->assertFalse($verified);
+    }
+
+    /**
+     * @param string $pathname
+     *
+     * @dataProvider providerPemsNotHavingPassPhrases
+     */
+    public function testAddPassPhrase($pathname)
+    {
+        copy($pathname, $this->file);
+
+        $pemFile = new PemFile($this->file);
+
+        $pemFile->addPassPhrase(static::TEST_PASSPHRASE);
+
+        $verified = $pemFile->verifyPassPhrase(static::TEST_PASSPHRASE);
+
+        $this->assertTrue($verified);
+    }
+
+    /**
+     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     */
+    public function testAddPassPhraseEmptyPassPhrase()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/pem-nopass.pem', $this->file);
+
+        $pemFile = new PemFile($this->file);
+
+        $pemFile->addPassPhrase(static::TEST_EMPTYPASSPHRASE);
+    }
+
+    /**
+     * @param string $pathname
+     *
+     * @dataProvider providerPemsHavingPassPhrases
+     */
+    public function testRemovePassPhrase($pathname)
+    {
+        copy($pathname, $this->file);
+
+        $pemFile = new PemFile($this->file);
+
+        $pemFile->removePassPhrase(static::TEST_PASSPHRASE);
+
+        $this->assertFalse($pemFile->hasPassPhrase());
+    }
+
+    /**
+     * @param string $pathname
+     *
+     * @dataProvider providerPemsHavingPassPhrases
+     */
+    public function testChangePassPhrase($pathname)
+    {
+        copy($pathname, $this->file);
+
+        $pemFile = new PemFile($this->file);
+
+        $pemFile->changePassPhrase(static::TEST_PASSPHRASE, 'new-passphrase');
+
+        $verified = $pemFile->verifyPassPhrase('new-passphrase');
+
+        $this->assertTrue($verified);
+    }
+
+    /**
+     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     */
+    public function testChangePassPhraseEmptyPassPhrase()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
+
+        $pemFile = new PemFile($this->file);
+
+        $pemFile->changePassPhrase(static::TEST_PASSPHRASE, static::TEST_EMPTYPASSPHRASE);
+    }
+
     public function testMove()
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
@@ -282,7 +378,27 @@ class PemFileTest extends TestCase
     public function providerPemsAndPassPhrases()
     {
         return array(
-            array(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', static::TEST_PASSWORD),
+            array(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', static::TEST_PASSPHRASE),
+            array(__DIR__ . '/../Fixtures/Certificates/pem-nopass.pem'),
+        );
+    }
+
+    /**
+     * return array[]
+     */
+    public function providerPemsHavingPassPhrases()
+    {
+        return array(
+            array(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem'),
+        );
+    }
+
+    /**
+     * return array[]
+     */
+    public function providerPemsNotHavingPassPhrases()
+    {
+        return array(
             array(__DIR__ . '/../Fixtures/Certificates/pem-nopass.pem'),
         );
     }
@@ -313,18 +429,18 @@ class PemFileTest extends TestCase
     public function providerCreate()
     {
         return array(
-            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', __DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', static::TEST_PASSWORD),
+            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', __DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', static::TEST_PASSPHRASE),
             array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', __DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'),
             array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', __DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', __DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', static::TEST_PASSWORD),
-//            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', __DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', static::TEST_PASSWORD),
+            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', __DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', static::TEST_PASSPHRASE),
+//            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', __DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', static::TEST_PASSPHRASE),
             array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', __DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'),
             array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', __DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', __DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', static::TEST_PASSWORD),
+            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', __DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', static::TEST_PASSPHRASE),
             array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', __DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'),
             array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', __DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', __DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', static::TEST_PASSWORD),
-//            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', __DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', static::TEST_PASSWORD),
+            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', __DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', static::TEST_PASSPHRASE),
+//            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', __DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', static::TEST_PASSPHRASE),
             array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', __DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'),
             array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', __DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'),
         );

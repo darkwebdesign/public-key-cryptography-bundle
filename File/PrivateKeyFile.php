@@ -144,6 +144,118 @@ class PrivateKeyFile extends CryptoFile
     }
 
     /**
+     * @param string $passPhrase
+     *
+     * @return bool
+     */
+    public function verifyPassPhrase($passPhrase)
+    {
+        $in = escapeshellarg($this->getPathname());
+        $inForm = escapeshellarg($this->getFormat());
+        $pass = escapeshellarg($passPhrase);
+
+        $command = "openssl rsa -in $in -inform $inForm -passin pass:$pass -check -noout";
+
+        $process = new Process($command);
+        $process->run();
+
+        return $process->isSuccessful();
+    }
+
+    /**
+     * @param string $passPhrase
+     *
+     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
+     *
+     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function addPassPhrase($passPhrase)
+    {
+        if ('' === $passPhrase) {
+            throw new PrivateKeyPassPhraseEmptyException();
+        }
+
+        $in = escapeshellarg($this->getPathname());
+        $inForm = escapeshellarg($this->getFormat());
+        $pass = escapeshellarg($passPhrase);
+
+        $command = "
+            openssl rsa -in $in -inform $inForm -passin pass: -out $in~ -outform $inForm -passout pass:$pass -des3 &&
+            mv $in~ $in ||
+            rm $in~";
+
+        $process = new Process($command);
+        $process->mustRun();
+
+        @chmod($this->getPathname(), 0666 & ~umask());
+        clearstatcache(true, $this->getPathname());
+
+        return new self($this->getPathname());
+    }
+
+    /**
+     * @param string $passPhrase
+     *
+     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function removePassPhrase($passPhrase)
+    {
+        $in = escapeshellarg($this->getPathname());
+        $inForm = escapeshellarg($this->getFormat());
+        $pass = escapeshellarg($passPhrase);
+
+        $command = "
+            openssl rsa -in $in -inform $inForm -passin pass:$pass -out $in~ -outform $inForm &&
+            mv $in~ $in ||
+            rm $in~";
+
+        $process = new Process($command);
+        $process->mustRun();
+
+        @chmod($this->getPathname(), 0666 & ~umask());
+        clearstatcache(true, $this->getPathname());
+
+        return new self($this->getPathname());
+    }
+
+    /**
+     * @param string $passPhrase
+     * @param string $newPassPhrase
+     *
+     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
+     *
+     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function changePassPhrase($passPhrase, $newPassPhrase)
+    {
+        if ('' === $newPassPhrase) {
+            throw new PrivateKeyPassPhraseEmptyException();
+        }
+
+        $in = escapeshellarg($this->getPathname());
+        $inForm = escapeshellarg($this->getFormat());
+        $pass = escapeshellarg($passPhrase);
+        $newPass = escapeshellarg($newPassPhrase);
+
+        $command = "
+            openssl rsa -in $in -inform $inForm -passin pass:$pass -out $in~ -outform $inForm -passout pass:$newPass -des3 &&
+            mv $in~ $in ||
+            rm $in~";
+
+        $process = new Process($command);
+        $process->mustRun();
+
+        @chmod($this->getPathname(), 0666 & ~umask());
+        clearstatcache(true, $this->getPathname());
+
+        return new self($this->getPathname());
+    }
+
+    /**
      * @param string $directory
      * @param string|null $name
      *

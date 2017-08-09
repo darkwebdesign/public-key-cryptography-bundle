@@ -25,8 +25,8 @@ use PHPUnit\Framework\TestCase;
 
 class PrivateKeyFileTest extends TestCase
 {
-    const TEST_PASSWORD = 'test';
-    const TEST_EMPTYPASSWORD = '';
+    const TEST_PASSPHRASE = 'test';
+    const TEST_EMPTYPASSPHRASE = '';
 
     /** @var string */
     private $file;
@@ -125,7 +125,7 @@ class PrivateKeyFileTest extends TestCase
 
         $privateKeyFile = new PrivateKeyFile($this->file);
 
-        $privateKeyFile->convertFormat(PrivateKeyFile::FORMAT_DER, static::TEST_EMPTYPASSWORD);
+        $privateKeyFile->convertFormat(PrivateKeyFile::FORMAT_DER, static::TEST_EMPTYPASSPHRASE);
     }
 
     /**
@@ -141,6 +141,102 @@ class PrivateKeyFileTest extends TestCase
         $privateKeyFile = new PrivateKeyFile($this->file);
 
         $this->assertSame($hasPassphrase, $privateKeyFile->hasPassphrase());
+    }
+
+    /**
+     * @param string $pathname
+     *
+     * @dataProvider providerPrivateKeysHavingPassPhrases
+     */
+    public function testVerifyPassPhrase($pathname)
+    {
+        copy($pathname, $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $verified = $privateKeyFile->verifyPassPhrase(static::TEST_PASSPHRASE);
+
+        $this->assertTrue($verified);
+
+        $verified = $privateKeyFile->verifyPassPhrase('invalid-passphrase');
+
+        $this->assertFalse($verified);
+    }
+
+    /**
+     * @param string $pathname
+     *
+     * @dataProvider providerPrivateKeysNotHavingPassPhrases
+     */
+    public function testAddPassPhrase($pathname)
+    {
+        copy($pathname, $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $privateKeyFile->addPassPhrase(static::TEST_PASSPHRASE);
+
+        $verified = $privateKeyFile->verifyPassPhrase(static::TEST_PASSPHRASE);
+
+        $this->assertTrue($verified);
+    }
+
+    /**
+     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     */
+    public function testAddPassPhraseEmptyPassPhrase()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key', $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $privateKeyFile->addPassPhrase(static::TEST_EMPTYPASSPHRASE);
+    }
+
+    /**
+     * @param string $pathname
+     *
+     * @dataProvider providerPrivateKeysHavingPassPhrases
+     */
+    public function testRemovePassPhrase($pathname)
+    {
+        copy($pathname, $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $privateKeyFile->removePassPhrase(static::TEST_PASSPHRASE);
+
+        $this->assertFalse($privateKeyFile->hasPassPhrase());
+    }
+
+    /**
+     * @param string $pathname
+     *
+     * @dataProvider providerPrivateKeysHavingPassPhrases
+     */
+    public function testChangePassPhrase($pathname)
+    {
+        copy($pathname, $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $privateKeyFile->changePassPhrase(static::TEST_PASSPHRASE, 'new-passphrase');
+
+        $verified = $privateKeyFile->verifyPassPhrase('new-passphrase');
+
+        $this->assertTrue($verified);
+    }
+
+    /**
+     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     */
+    public function testChangePassPhraseEmptyPassPhrase()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $privateKeyFile->changePassPhrase(static::TEST_PASSPHRASE, static::TEST_EMPTYPASSPHRASE);
     }
 
     public function testMove()
@@ -187,6 +283,31 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
+     * @return array[]
+     */
+    public function providerPrivateKeysHavingPassPhrases()
+    {
+        return array(
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key'),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key'),
+//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key'),
+        );
+    }
+
+    /**
+     * @return array[]
+     */
+    public function providerPrivateKeysNotHavingPassPhrases()
+    {
+        return array(
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'),
+//            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'),
+//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'),
+        );
+    }
+
+    /**
      * return array[]
      */
     public function providerNotPrivateKeys()
@@ -207,16 +328,16 @@ class PrivateKeyFileTest extends TestCase
     public function providerConvertFormat()
     {
         return array(
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', PrivateKeyFile::FORMAT_PEM, static::TEST_PASSWORD),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', PrivateKeyFile::FORMAT_DER, static::TEST_PASSWORD),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', PrivateKeyFile::FORMAT_PEM, static::TEST_PASSPHRASE),
+//            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', PrivateKeyFile::FORMAT_DER, static::TEST_PASSPHRASE),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key', PrivateKeyFile::FORMAT_PEM),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key', PrivateKeyFile::FORMAT_DER),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key', PrivateKeyFile::FORMAT_PEM),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key', PrivateKeyFile::FORMAT_DER),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', PrivateKeyFile::FORMAT_PEM, static::TEST_PASSWORD),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', PrivateKeyFile::FORMAT_DER, static::TEST_PASSWORD),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', PrivateKeyFile::FORMAT_PEM, static::TEST_PASSWORD),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', PrivateKeyFile::FORMAT_DER, static::TEST_PASSWORD),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', PrivateKeyFile::FORMAT_PEM, static::TEST_PASSPHRASE),
+//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', PrivateKeyFile::FORMAT_DER, static::TEST_PASSPHRASE),
+//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', PrivateKeyFile::FORMAT_PEM, static::TEST_PASSPHRASE),
+//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', PrivateKeyFile::FORMAT_DER, static::TEST_PASSPHRASE),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key', PrivateKeyFile::FORMAT_PEM),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key', PrivateKeyFile::FORMAT_DER),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key', PrivateKeyFile::FORMAT_PEM),
