@@ -198,7 +198,9 @@ class PrivateKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $command = "openssl rsa -in $in -inform $inForm -passin pass: -check -noout";
+        $command = "
+            openssl rsa -in $in -inform $inForm -passin pass: -check -noout &&
+            openssl rsa -in $in -inform $inForm -passin pass:nopass -check -noout";
 
         $process = new Process($command);
         $process->run();

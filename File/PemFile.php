@@ -350,7 +350,9 @@ class PemFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        $command = "openssl rsa -in $in -passin pass: -check -noout";
+        $command = "
+            openssl rsa -in $in -passin pass: -check -noout &&
+            openssl rsa -in $in -passin pass:nopass -check -noout";
 
         $process = new Process($command);
         $process->run();
