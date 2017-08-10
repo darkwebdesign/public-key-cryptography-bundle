@@ -130,8 +130,8 @@ class PrivateKeyFile extends CryptoFile
 
         $command = "
             openssl rsa -in $in -inform $inForm -passin pass:$pass -out $in~ -outform $outForm $rsaPassOut &&
-            mv $in~ $in ||
-            rm $in~";
+            mv --force $in~ $in ||
+            rm --force $in~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -214,8 +214,8 @@ class PrivateKeyFile extends CryptoFile
 
         $command = "
             openssl rsa -in $in -inform $inForm -passin pass: -out $in~ -outform $inForm -passout pass:$pass -des3 &&
-            mv $in~ $in ||
-            rm $in~";
+            mv --force $in~ $in ||
+            rm --force $in~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -243,8 +243,8 @@ class PrivateKeyFile extends CryptoFile
 
         $command = "
             openssl rsa -in $in -inform $inForm -passin pass:$pass -out $in~ -outform $inForm &&
-            mv $in~ $in ||
-            rm $in~";
+            mv --force $in~ $in ||
+            rm --force $in~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -282,8 +282,8 @@ class PrivateKeyFile extends CryptoFile
 
         $command = "
             openssl rsa -in $in -inform $inForm -passin pass:$pass -out $in~ -outform $inForm -passout pass:$newPass -des3 &&
-            mv $in~ $in ||
-            rm $in~";
+            mv --force $in~ $in ||
+            rm --force $in~";
 
         $process = new Process($command);
         $process->mustRun();

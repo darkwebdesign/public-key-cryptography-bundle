@@ -91,8 +91,8 @@ class KeystoreFile extends CryptoFile
                 openssl x509 -in $publicKeyIn -inform $publicKeyInForm
             } |
             openssl pkcs12 -passin pass:pipe -out $out~ -passout pass:$pass -export &&
-            mv $out~ $out ||
-            rm $out~";
+            mv --force $out~ $out ||
+            rm --force $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -130,8 +130,8 @@ class KeystoreFile extends CryptoFile
                 openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe |
                 openssl rsa -passin pass:pipe $rsaPassOut
             } > $out~ &&
-            mv $out~ $out ||
-            rm $out~";
+            mv --force $out~ $out ||
+            rm --force $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -160,7 +160,8 @@ class KeystoreFile extends CryptoFile
         $command = "
             openssl pkcs12 -in $in -passin pass:$pass -nokeys |
             openssl x509 -out $out~ &&
-            mv $out~ $out";
+            mv --force $out~ $out ||
+            rm --force $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -199,7 +200,8 @@ class KeystoreFile extends CryptoFile
         $command = "
             openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe |
             openssl rsa -passin pass:pipe -out $out~ $rsaPassOut &&
-            mv $out~ $out";
+            mv --force $out~ $out ||
+            rm --force $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -350,8 +352,8 @@ class KeystoreFile extends CryptoFile
                 openssl x509
             } |
             openssl pkcs12 -passin pass:pipe -out $in~ -passout pass:$newPass -export &&
-            mv $in~ $in ||
-            rm $in~";
+            mv --force $in~ $in ||
+            rm --force $in~";
 
         $process = new Process($command);
         $process->mustRun();

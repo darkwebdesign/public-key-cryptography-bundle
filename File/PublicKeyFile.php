@@ -187,8 +187,8 @@ class PublicKeyFile extends CryptoFile
 
         $command = "
             openssl x509 -in $in -inform $inForm -out $in~ -outform $outForm &&
-            mv $in~ $in ||
-            rm $in~";
+            mv --force $in~ $in ||
+            rm --force $in~";
 
         $process = new Process($command);
         $process->mustRun();

@@ -107,8 +107,8 @@ class PemFile extends CryptoFile
                 openssl x509 -in $publicKeyIn -inform $publicKeyInForm
                 openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass $rsaPassOut
             } > $out~ &&
-            mv $out~ $out ||
-            rm $out~";
+            mv --force $out~ $out ||
+            rm --force $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -138,8 +138,8 @@ class PemFile extends CryptoFile
 
         $command = "
             openssl pkcs12 -in $in -passin pass:$privateKeyPass -out $out~ -passout pass:$keystorePass -export &&
-            mv $out~ $out ||
-            rm $out~";
+            mv --force $out~ $out ||
+            rm --force $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -165,8 +165,8 @@ class PemFile extends CryptoFile
 
         $command = "
             openssl x509 -in $in -out $out~ &&
-            mv $out~ $out ||
-            rm $out~";
+            mv --force $out~ $out ||
+            rm --force $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -209,8 +209,8 @@ class PemFile extends CryptoFile
 
         $command = "
             openssl rsa -in $in -passin pass:$privateKeyPass -out $out~ $rsaPassOut &&
-            mv $out~ $out ||
-            rm $out~";
+            mv --force $out~ $out ||
+            rm --force $out~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -363,8 +363,8 @@ class PemFile extends CryptoFile
                 openssl x509 -in $in
                 openssl rsa -in $in -passin pass: -passout pass:$pass -des3
             } > $in~ &&
-            mv $in~ $in ||
-            rm $in~";
+            mv --force $in~ $in ||
+            rm --force $in~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -394,8 +394,8 @@ class PemFile extends CryptoFile
                 openssl x509 -in $in
                 openssl rsa -in $in -passin pass:$pass
             } > $in~ &&
-            mv $in~ $in ||
-            rm $in~";
+            mv --force $in~ $in ||
+            rm --force $in~";
 
         $process = new Process($command);
         $process->mustRun();
@@ -435,8 +435,8 @@ class PemFile extends CryptoFile
                 openssl x509 -in $in
                 openssl rsa -in $in -passin pass:$pass -passout pass:$newPass -des3
             } > $in~ &&
-            mv $in~ $in ||
-            rm $in~";
+            mv --force $in~ $in ||
+            rm --force $in~";
 
         $process = new Process($command);
         $process->mustRun();
