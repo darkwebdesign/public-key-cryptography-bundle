@@ -155,17 +155,17 @@ class PemFileTest extends TestCase
 
     /**
      * @param string $path
-     * @param string|null $privateKeyPassPhrase
+     * @param string|null $passPhrase
      *
      * @dataProvider providerPemsAndPassPhrases
      */
-    public function testGetPrivateKey($path, $privateKeyPassPhrase = null)
+    public function testGetPrivateKey($path, $passPhrase = null)
     {
         copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 
-        $privateKeyFile = $pemFile->getPrivateKey($pemFile->getPathname(), $privateKeyPassPhrase);
+        $privateKeyFile = $pemFile->getPrivateKey($pemFile->getPathname(), $passPhrase);
 
         $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile', $privateKeyFile);
     }
@@ -246,17 +246,17 @@ class PemFileTest extends TestCase
 
     /**
      * @param string $path
-     * @param string|null $privateKeyPassPhrase
+     * @param string|null $passPhrase
      *
      * @dataProvider providerPemsAndPassPhrases
      */
-    public function testHasPassPhrase($path, $privateKeyPassPhrase = null)
+    public function testHasPassPhrase($path, $passPhrase = null)
     {
         copy($path, $this->file);
 
         $pemFile = new PemFile($this->file);
 
-        $this->assertSame(null !== $privateKeyPassPhrase, $pemFile->hasPassphrase());
+        $this->assertSame(null !== $passPhrase, $pemFile->hasPassphrase());
     }
 
     /**
