@@ -93,6 +93,18 @@ class PemFileTest extends TestCase
     }
 
     /**
+     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     */
+    public function testSanitizeEmptyPassPhrase()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
+
+        $pemFile = new PemFile($this->file);
+
+        $pemFile->sanitize(static::TEST_EMPTYPASSPHRASE);
+    }
+
+    /**
      * @param string $publicKeyPath
      * @param string $privateKeyPath
      * @param string|null $privateKeyPassPhrase

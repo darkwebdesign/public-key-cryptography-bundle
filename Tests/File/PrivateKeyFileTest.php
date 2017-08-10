@@ -87,6 +87,18 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
+     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     */
+    public function testSanitizeEmptyPassPhrase()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $privateKeyFile->sanitize(static::TEST_EMPTYPASSPHRASE);
+    }
+
+    /**
      * @param string $path
      * @param string $format
      *
