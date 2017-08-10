@@ -20,10 +20,8 @@
 
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Tests\File;
 
-use DarkWebDesign\PublicKeyCryptographyBundle\File\CryptoFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\Tests\Fixtures\File\MoveNotOverriddenFile;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\File\File;
 
 class CryptoFileTest extends TestCase
 {
