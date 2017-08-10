@@ -71,6 +71,23 @@ class PrivateKeyFileTest extends TestCase
 
     /**
      * @param string $path
+     * @param string|null $passPhrase
+     *
+     * @dataProvider providerPrivateKeysAndPassPhrases
+     */
+    public function testSanitize($path, $passPhrase = null)
+    {
+        copy($path, $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $privateKeyFile = $privateKeyFile->sanitize($passPhrase);
+
+        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile', $privateKeyFile);
+    }
+
+    /**
+     * @param string $path
      * @param string $format
      *
      * @dataProvider providerPrivateKeysAndFormats
@@ -261,6 +278,22 @@ class PrivateKeyFileTest extends TestCase
             array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key'),
 //            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key'),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'),
+        );
+    }
+
+    /**
+     * return array[]
+     */
+    public function providerPrivateKeysAndPassPhrases()
+    {
+        return array(
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', static::TEST_PASSPHRASE),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'),
+            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', static::TEST_PASSPHRASE),
+//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', static::TEST_PASSPHRASE),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'),
             array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'),
         );

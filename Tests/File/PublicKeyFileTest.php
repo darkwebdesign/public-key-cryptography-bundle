@@ -74,6 +74,22 @@ class PublicKeyFileTest extends TestCase
 
     /**
      * @param string $path
+     *
+     * @dataProvider providerPublicKeys
+     */
+    public function testSanitize($path)
+    {
+        copy($path, $this->file);
+
+        $publicKeyFile = new PublicKeyFile($this->file);
+
+        $publicKeyFile = $publicKeyFile->sanitize();
+
+        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile', $publicKeyFile);
+    }
+
+    /**
+     * @param string $path
      * @param string $format
      *
      * @dataProvider providerPublicKeysAndFormats

@@ -75,6 +75,49 @@ class PrivateKeyFile extends CryptoFile
     }
 
     /**
+     * Sanitizes the private key, removing malicious data.
+     *
+     * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
+     * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown.
+     *
+     * @param string|null $passPhrase
+     *
+     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
+     *
+     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function sanitize($passPhrase = null)
+    {
+        if ('' === $passPhrase) {
+            throw new PrivateKeyPassPhraseEmptyException();
+        }
+
+        $in = escapeshellarg($this->getPathname());
+        $inForm = escapeshellarg($this->getFormat());
+        $pass = escapeshellarg($passPhrase);
+
+        if (null !== $passPhrase) {
+            $rsaPassOut = "-passout pass:$pass -des3";
+        } else {
+            $rsaPassOut = '';
+        }
+
+        $command = "
+            openssl rsa -in $in -inform $inForm -passin pass:$pass -out $in~ -outform $inForm $rsaPassOut &&
+            mv --force $in~ $in ||
+            rm --force $in~";
+
+        $process = new Process($command);
+        $process->mustRun();
+
+        @chmod($this->getPathname(), 0666 & ~umask());
+        clearstatcache(true, $this->getPathname());
+
+        return new self($this->getPathname());
+    }
+
+    /**
      * Gets the private key format (either ascii 'pem' or binary 'der').
      *
      * @return string

@@ -70,6 +70,32 @@ class PublicKeyFile extends CryptoFile
     }
 
     /**
+     * Sanitizes the public key, removing malicious data.
+     *
+     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile
+     *
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function sanitize()
+    {
+        $in = escapeshellarg($this->getPathname());
+        $inForm = escapeshellarg($this->getFormat());
+
+        $command = "
+            openssl x509 -in $in -inform $inForm -out $in~ -outform $inForm &&
+            mv --force $in~ $in ||
+            rm --force $in~";
+
+        $process = new Process($command);
+        $process->mustRun();
+
+        @chmod($this->getPathname(), 0666 & ~umask());
+        clearstatcache(true, $this->getPathname());
+
+        return new self($this->getPathname());
+    }
+
+    /**
      * Gets the public key format (either ascii 'pem' or binary 'der').
      *
      * @return string

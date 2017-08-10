@@ -76,6 +76,23 @@ class PemFileTest extends TestCase
     }
 
     /**
+     * @param string $path
+     * @param string|null $passPhrase
+     *
+     * @dataProvider providerPemsAndPassPhrases
+     */
+    public function testSanitize($path, $passPhrase = null)
+    {
+        copy($path, $this->file);
+
+        $pemFile = new PemFile($this->file);
+
+        $pemFile = $pemFile->sanitize($passPhrase);
+
+        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile', $pemFile);
+    }
+
+    /**
      * @param string $publicKeyPath
      * @param string $privateKeyPath
      * @param string|null $privateKeyPassPhrase

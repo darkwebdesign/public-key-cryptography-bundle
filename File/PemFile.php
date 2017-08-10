@@ -67,6 +67,51 @@ class PemFile extends CryptoFile
     }
 
     /**
+     * Sanitizes the PEM file, removing malicious data.
+     *
+     * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
+     * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown.
+     *
+     * @param string|null $passPhrase
+     *
+     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile
+     *
+     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
+     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function sanitize($passPhrase = null)
+    {
+        if ('' === $passPhrase) {
+            throw new PrivateKeyPassPhraseEmptyException();
+        }
+
+        $in = escapeshellarg($this->getPathname());
+        $pass = escapeshellarg($passPhrase);
+
+        if (null !== $passPhrase) {
+            $rsaPassOut = "-passout pass:$pass -des3";
+        } else {
+            $rsaPassOut = '';
+        }
+
+        $command = "
+            {
+                openssl x509 -in $in
+                openssl rsa -in $in -passin pass:$pass $rsaPassOut
+            } > $in~ &&
+            mv --force $in~ $in ||
+            rm --force $in~";
+
+        $process = new Process($command);
+        $process->mustRun();
+
+        @chmod($this->getPathname(), 0666 & ~umask());
+        clearstatcache(true, $this->getPathname());
+
+        return new self($this->getPathname());
+    }
+
+    /**
      * Creates a new PEM file from a public/private key pair.
      *
      * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
