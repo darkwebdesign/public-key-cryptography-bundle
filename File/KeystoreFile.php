@@ -333,7 +333,7 @@ class KeystoreFile extends CryptoFile
      * @param string $passPhrase
      * @param string $newPassPhrase
      *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile
+     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile
      *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
