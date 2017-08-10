@@ -119,7 +119,7 @@ class PemFile extends CryptoFile
      * pass phrase on the private key instead.
      *
      * @param string $path
-     * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile  $publicKeyFile
+     * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile $publicKeyFile
      * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile $privateKeyFile
      * @param string|null $privateKeyPassPhrase
      *
