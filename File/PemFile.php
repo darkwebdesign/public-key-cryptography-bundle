@@ -123,15 +123,10 @@ class PemFile extends CryptoFile
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile
      *
-     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getKeystore($path, $keystorePassPhrase, $privateKeyPassPhrase = null)
     {
-        if ('' === $privateKeyPassPhrase) {
-            throw new PrivateKeyPassPhraseEmptyException();
-        }
-
         $in = escapeshellarg($this->getPathname());
         $out = escapeshellarg($path);
         $keystorePass = escapeshellarg($keystorePassPhrase);

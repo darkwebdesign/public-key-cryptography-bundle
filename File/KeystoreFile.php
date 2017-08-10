@@ -69,15 +69,10 @@ class KeystoreFile extends CryptoFile
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile
      *
-     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public static function create($path, $passPhrase, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, $privateKeyPassPhrase = null)
     {
-        if ('' === $privateKeyPassPhrase) {
-            throw new PrivateKeyPassPhraseEmptyException();
-        }
-
         $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
         $publicKeyIn = escapeshellarg($publicKeyFile->getPathname());

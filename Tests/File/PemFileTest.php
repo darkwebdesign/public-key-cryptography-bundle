@@ -121,18 +121,6 @@ class PemFileTest extends TestCase
     }
 
     /**
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
-     */
-    public function testGetKeystoreEmptyPassPhrase()
-    {
-        copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
-
-        $pemFile = new PemFile($this->file);
-
-        $pemFile->getKeystore($pemFile->getPathname(), static::TEST_PASSPHRASE, static::TEST_EMPTYPASSPHRASE);
-    }
-
-    /**
      * @param string $path
      *
      * @dataProvider providerPems

@@ -93,17 +93,6 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
-     */
-    public function testCreateEmptyPassPhrase()
-    {
-        $publicKeyFile = new PublicKeyFile(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt');
-        $privateKeyFile = new PrivateKeyFile(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key');
-
-        KeystoreFile::create($this->file, static::TEST_PASSPHRASE, $publicKeyFile, $privateKeyFile, static::TEST_EMPTYPASSPHRASE);
-    }
-
-    /**
      * @param string $path
      * @param string $passPhrase
      *
