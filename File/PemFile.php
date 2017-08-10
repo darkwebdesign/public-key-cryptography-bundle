@@ -184,31 +184,31 @@ class PemFile extends CryptoFile
      * pass phrase on the private key instead.
      *
      * @param string $path
-     * @param string|null $privateKeyPassPhrase
+     * @param string|null $passPhrase
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
      *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPrivateKey($path, $privateKeyPassPhrase = null)
+    public function getPrivateKey($path, $passPhrase = null)
     {
-        if ('' === $privateKeyPassPhrase) {
+        if ('' === $passPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
         }
 
         $in = escapeshellarg($this->getPathname());
         $out = escapeshellarg($path);
-        $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
+        $pass = escapeshellarg($passPhrase);
 
-        if (null !== $privateKeyPassPhrase) {
-            $rsaPassOut = "-passout pass:$privateKeyPass -des3";
+        if (null !== $passPhrase) {
+            $rsaPassOut = "-passout pass:$pass -des3";
         } else {
             $rsaPassOut = '';
         }
 
         $command = "
-            openssl rsa -in $in -passin pass:$privateKeyPass -out $out~ $rsaPassOut &&
+            openssl rsa -in $in -passin pass:$pass -out $out~ $rsaPassOut &&
             mv --force $out~ $out ||
             rm --force $out~";
 
