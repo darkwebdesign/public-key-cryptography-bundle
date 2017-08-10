@@ -40,6 +40,10 @@ class PrivateKeyFile extends CryptoFile
     /**
      * Validates that the file is actually a private key.
      *
+     * Known issues:
+     * OpenSSL (at lease 1.0.1e-fips) has issues reading PKCS#8 private keys in the DER format. Therefore these private
+     * keys might not be successfully validated as valid private key.
+     *
      * @return bool
      */
     protected function validate()
@@ -82,6 +86,11 @@ class PrivateKeyFile extends CryptoFile
 
     /**
      * Converts the private key format to either ascii 'pem' or binary 'der'.
+     *
+     * Known issues:
+     * OpenSSL (at lease 0.9.8zh and 1.0.1e-fips) has issues writing RSA private keys in the DER format with a pass
+     * phrase. Therefore converting a pivate key with a pass phrase to the DER format might result in a private key
+     * without a pass phrase.
      *
      * @param string $format
      * @param string|null $passPhrase
@@ -154,6 +163,9 @@ class PrivateKeyFile extends CryptoFile
     /**
      * Verifies a pass phrase against the private key.
      *
+     * This methods verifies if the specified pass phrase can be used to read the private key. This means that verifying
+     * a private key without a pass phrase will always return true for all specified pass phrases.
+     *
      * @param string $passPhrase
      *
      * @return bool
@@ -174,6 +186,14 @@ class PrivateKeyFile extends CryptoFile
 
     /**
      * Adds a pass phrase to the private key.
+     *
+     * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
+     * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown.
+     *
+     * Known issues:
+     * OpenSSL (at lease 0.9.8zh and 1.0.1e-fips) has issues writing RSA private keys in the DER format with a pass
+     * phrase. Therefore adding a pass phrase to a pivate key with in the DER format might result in a private key
+     * without a pass phrase.
      *
      * @param string $passPhrase
      *
@@ -237,6 +257,9 @@ class PrivateKeyFile extends CryptoFile
 
     /**
      * Changes the pass phrase of the private key.
+     *
+     * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
+     * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown.
      *
      * @param string $passPhrase
      * @param string $newPassPhrase

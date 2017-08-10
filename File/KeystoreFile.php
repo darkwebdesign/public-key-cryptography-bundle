@@ -61,6 +61,10 @@ class KeystoreFile extends CryptoFile
     /**
      * Creates a new keystore from a public/private key pair.
      *
+     * When a new keystore is created, the pass phrase of the private key contained in the keystore will be replaced by
+     * the keystore pass phrase. This is because most software always assumes that the keystore pass phrase and private
+     * key pass phrase are the same.
+     *
      * @param string $path
      * @param string $passPhrase
      * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile $publicKeyFile
@@ -168,6 +172,9 @@ class KeystoreFile extends CryptoFile
 
     /**
      * Gets the private key.
+     *
+     * It is not possible to write a private key with an empty pass phrase. Therefore whenever the keystore has an empty
+     * pass phrase, the private key will not contain a pass phrase instead.
      *
      * @param string $path
      * @param string $passPhrase

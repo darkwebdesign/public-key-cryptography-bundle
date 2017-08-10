@@ -69,6 +69,10 @@ class PemFile extends CryptoFile
     /**
      * Creates a new PEM file from a public/private key pair.
      *
+     * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
+     * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown. Pass NULL as pass phrase if you want no
+     * pass phrase on the private key instead.
+     *
      * @param string $path
      * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile  $publicKeyFile
      * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile $privateKeyFile
@@ -174,6 +178,10 @@ class PemFile extends CryptoFile
 
     /**
      * Gets the private key.
+     *
+     * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
+     * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown. Pass NULL as pass phrase if you want no
+     * pass phrase on the private key instead.
      *
      * @param string $path
      * @param string|null $privateKeyPassPhrase
@@ -308,6 +316,9 @@ class PemFile extends CryptoFile
     /**
      * Verifies a pass phrase against the private key.
      *
+     * This methods verifies if the specified pass phrase can be used to read the private key. This means that verifying
+     * a private key without a pass phrase will always return true for all specified pass phrases.
+     *
      * @param string $passPhrase
      *
      * @return bool
@@ -327,6 +338,9 @@ class PemFile extends CryptoFile
 
     /**
      * Adds a pass phrase to the private key.
+     *
+     * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
+     * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown.
      *
      * @param string $passPhrase
      *
@@ -394,6 +408,9 @@ class PemFile extends CryptoFile
 
     /**
      * Changes the pass phrase of the private key.
+     *
+     * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
+     * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown.
      *
      * @param string $passPhrase
      * @param string $newPassPhrase
