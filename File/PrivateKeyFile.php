@@ -87,6 +87,9 @@ class PrivateKeyFile extends CryptoFile
     /**
      * Converts the private key format to either ascii 'pem' or binary 'der'.
      *
+     * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
+     * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown.
+     *
      * Known issues:
      * OpenSSL (at lease 0.9.8zh and 1.0.1e-fips) has issues writing RSA private keys in the DER format with a pass
      * phrase. Therefore converting a pivate key with a pass phrase to the DER format might result in a private key
