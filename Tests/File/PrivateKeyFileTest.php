@@ -99,6 +99,18 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function testSanitizeProcessFailed()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $privateKeyFile->sanitize('invalid-passphrase');
+    }
+
+    /**
      * @param string $path
      * @param string $format
      *
@@ -158,6 +170,18 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function testConvertFormatProcessFailed()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $privateKeyFile->convertFormat(PrivateKeyFile::FORMAT_DER, 'invalid-passphrase');
+    }
+
+    /**
      * @param string $path
      * @param bool $privateKeyHasPassphrase
      *
@@ -183,13 +207,8 @@ class PrivateKeyFileTest extends TestCase
 
         $privateKeyFile = new PrivateKeyFile($this->file);
 
-        $verified = $privateKeyFile->verifyPassPhrase(static::TEST_PASSPHRASE);
-
-        $this->assertTrue($verified);
-
-        $verified = $privateKeyFile->verifyPassPhrase('invalid-passphrase');
-
-        $this->assertFalse($verified);
+        $this->assertTrue($privateKeyFile->verifyPassPhrase(static::TEST_PASSPHRASE));
+        $this->assertFalse($privateKeyFile->verifyPassPhrase('invalid-passphrase'));
     }
 
     /**
@@ -205,9 +224,8 @@ class PrivateKeyFileTest extends TestCase
 
         $privateKeyFile->addPassPhrase(static::TEST_PASSPHRASE);
 
-        $verified = $privateKeyFile->verifyPassPhrase(static::TEST_PASSPHRASE);
-
-        $this->assertTrue($verified);
+        $this->assertTrue($privateKeyFile->hasPassPhrase());
+        $this->assertTrue($privateKeyFile->verifyPassPhrase(static::TEST_PASSPHRASE));
     }
 
     /**
@@ -220,6 +238,20 @@ class PrivateKeyFileTest extends TestCase
         $privateKeyFile = new PrivateKeyFile($this->file);
 
         $privateKeyFile->addPassPhrase(static::TEST_EMPTYPASSPHRASE);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function testAddPassPhraseProcessFailed()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        unlink($this->file);
+
+        $privateKeyFile->addPassPhrase(static::TEST_PASSPHRASE);
     }
 
     /**
@@ -236,6 +268,18 @@ class PrivateKeyFileTest extends TestCase
         $privateKeyFile->removePassPhrase(static::TEST_PASSPHRASE);
 
         $this->assertFalse($privateKeyFile->hasPassPhrase());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function testRemovePassPhraseProcessFailed()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $privateKeyFile->removePassPhrase('invalid-passphrase');
     }
 
     /**
@@ -266,6 +310,18 @@ class PrivateKeyFileTest extends TestCase
         $privateKeyFile = new PrivateKeyFile($this->file);
 
         $privateKeyFile->changePassPhrase(static::TEST_PASSPHRASE, static::TEST_EMPTYPASSPHRASE);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function testChangePassPhraseProcessFailed()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
+
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $privateKeyFile->changePassPhrase('invalid-passphrase', 'new-passphrase');
     }
 
     public function testMove()

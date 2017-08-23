@@ -44,9 +44,7 @@ class KeystoreFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        $command = "openssl pkcs12 -in $in -passin pass: -noout";
-
-        $process = new Process($command);
+        $process = new Process("openssl pkcs12 -in $in -passin pass: -noout");
         $process->run();
 
         $invalidPassword = false !== strpos($process->getErrorOutput(), 'invalid password');
@@ -85,18 +83,17 @@ class KeystoreFile extends CryptoFile
         $privateKeyInForm = escapeshellarg($privateKeyFile->getFormat());
         $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
 
-        $command = "
-            {
-                openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass -passout pass:pipe -des3
-                openssl x509 -in $publicKeyIn -inform $publicKeyInForm
-            } |
-            openssl pkcs12 -passin pass:pipe -out $out~ -passout pass:$pass -export &&
-            mv --force $out~ $out ||
-            rm --force $out~";
+        $process1 = new Process("openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass -passout pass:pipe -des3");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process("openssl x509 -in $publicKeyIn -inform $publicKeyInForm");
+        $process2->mustRun();
 
+        $process3 = new Process("openssl pkcs12 -passin pass:pipe -passout pass:$pass -export");
+        $process3->setInput($process1->getOutput() . $process2->getOutput());
+        $process3->mustRun();
+
+        @file_put_contents($path, $process3->getOutput());
         @chmod($path, 0666 & ~umask());
 
         return new self($path);
@@ -125,19 +122,21 @@ class KeystoreFile extends CryptoFile
             $rsaPassOut = '';
         }
 
-        $command = "
-            {
-                openssl pkcs12 -in $in -passin pass:$pass -nokeys |
-                openssl x509
-                openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe |
-                openssl rsa -passin pass:pipe $rsaPassOut
-            } > $out~ &&
-            mv --force $out~ $out ||
-            rm --force $out~";
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process("openssl x509");
+        $process2->setInput($process1->getOutput());
+        $process2->mustRun();
 
+        $process3 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe");
+        $process3->mustRun();
+
+        $process4 = new Process("openssl rsa -passin pass:pipe $rsaPassOut");
+        $process4->setInput($process3->getOutput());
+        $process4->mustRun();
+
+        @file_put_contents($path, $process2->getOutput() . $process4->getOutput());
         @chmod($path, 0666 & ~umask());
 
         return new PemFile($path);
@@ -159,15 +158,14 @@ class KeystoreFile extends CryptoFile
         $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
 
-        $command = "
-            openssl pkcs12 -in $in -passin pass:$pass -nokeys |
-            openssl x509 -out $out~ &&
-            mv --force $out~ $out ||
-            rm --force $out~";
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process("openssl x509");
+        $process2->setInput($process1->getOutput());
+        $process2->mustRun();
 
+        @file_put_contents($path, $process2->getOutput());
         @chmod($path, 0666 & ~umask());
 
         return new PublicKeyFile($path);
@@ -199,15 +197,14 @@ class KeystoreFile extends CryptoFile
             $rsaPassOut = '';
         }
 
-        $command = "
-            openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe |
-            openssl rsa -passin pass:pipe -out $out~ $rsaPassOut &&
-            mv --force $out~ $out ||
-            rm --force $out~";
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process("openssl rsa -passin pass:pipe $rsaPassOut");
+        $process2->setInput($process1->getOutput());
+        $process2->mustRun();
 
+        @file_put_contents($path, $process2->getOutput());
         @chmod($path, 0666 & ~umask());
 
         return new PrivateKeyFile($path);
@@ -227,14 +224,14 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $command = "
-            openssl pkcs12 -in $in -passin pass:$pass -nokeys |
-            openssl x509 -noout -subject";
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process('openssl x509 -noout -subject');
+        $process2->setInput($process1->getOutput());
+        $process2->mustRun();
 
-        return trim(preg_replace('/^subject=/', '', $process->getOutput()));
+        return trim(preg_replace('/^subject=/', '', $process2->getOutput()));
     }
 
     /**
@@ -251,14 +248,14 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $command = "
-            openssl pkcs12 -in $in -passin pass:$pass -nokeys |
-            openssl x509 -noout -issuer";
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process('openssl x509 -noout -issuer');
+        $process2->setInput($process1->getOutput());
+        $process2->mustRun();
 
-        return trim(preg_replace('/^issuer=/', '', $process->getOutput()));
+        return trim(preg_replace('/^issuer=/', '', $process2->getOutput()));
     }
 
     /**
@@ -275,14 +272,14 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $command = "
-            openssl pkcs12 -in $in -passin pass:$pass -nokeys |
-            openssl x509 -noout -startdate";
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process('openssl x509 -noout -startdate');
+        $process2->setInput($process1->getOutput());
+        $process2->mustRun();
 
-        return new \DateTime(trim(preg_replace('/^notBefore=/', '', $process->getOutput())));
+        return new \DateTime(trim(preg_replace('/^notBefore=/', '', $process2->getOutput())));
     }
 
     /**
@@ -299,14 +296,14 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $command = "
-            openssl pkcs12 -in $in -passin pass:$pass -nokeys |
-            openssl x509 -noout -enddate";
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process('openssl x509 -noout -enddate');
+        $process2->setInput($process1->getOutput());
+        $process2->mustRun();
 
-        return new \DateTime(trim(preg_replace('/^notAfter=/', '', $process->getOutput())));
+        return new \DateTime(trim(preg_replace('/^notAfter=/', '', $process2->getOutput())));
     }
 
     /**
@@ -321,9 +318,7 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $command = "openssl pkcs12 -in $in -passin pass:$pass -noout";
-
-        $process = new Process($command);
+        $process = new Process("openssl pkcs12 -in $in -passin pass:$pass -noout");
         $process->run();
 
         return $process->isSuccessful();
@@ -346,20 +341,25 @@ class KeystoreFile extends CryptoFile
         $pass = escapeshellarg($passPhrase);
         $newPass = escapeshellarg($newPassPhrase);
 
-        $command = "
-            {
-                openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe |
-                openssl rsa -passin pass:pipe -passout pass:pipe
-                openssl pkcs12 -in $in -passin pass:$pass -nokeys |
-                openssl x509
-            } |
-            openssl pkcs12 -passin pass:pipe -out $in~ -passout pass:$newPass -export &&
-            mv --force $in~ $in ||
-            rm --force $in~";
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process("openssl rsa -passin pass:pipe -passout pass:pipe");
+        $process2->setInput($process1->getOutput());
+        $process2->mustRun();
 
+        $process3 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process3->mustRun();
+
+        $process4 = new Process("openssl x509");
+        $process4->setInput($process3->getOutput());
+        $process4->mustRun();
+
+        $process5 = new Process("openssl pkcs12 -passin pass:pipe -passout pass:$newPass -export");
+        $process5->setInput($process2->getOutput() . $process4->getOutput());
+        $process5->mustRun();
+
+        @file_put_contents($this->getPathname(), $process5->getOutput());
         @chmod($this->getPathname(), 0666 & ~umask());
         clearstatcache(true, $this->getPathname());
 

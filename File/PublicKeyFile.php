@@ -46,18 +46,14 @@ class PublicKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $command = "openssl x509 -in $in -inform $inForm -noout";
-
-        $process = new Process($command);
+        $process = new Process("openssl x509 -in $in -inform $inForm -noout");
         $process->run();
 
         if (!$process->isSuccessful()) {
             return false;
         }
 
-        $command = "openssl rsa -in $in -inform $inForm -passin pass: -check -noout";
-
-        $process = new Process($command);
+        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass: -check -noout");
         $process->run();
 
         $badPasswordRead = false !== strpos($process->getErrorOutput(), ':bad password read:');
@@ -81,14 +77,10 @@ class PublicKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $command = "
-            openssl x509 -in $in -inform $inForm -out $in~ -outform $inForm &&
-            mv --force $in~ $in ||
-            rm --force $in~";
-
-        $process = new Process($command);
+        $process = new Process("openssl x509 -in $in -inform $inForm -outform $inForm");
         $process->mustRun();
 
+        @file_put_contents($this->getPathname(), $process->getOutput());
         @chmod($this->getPathname(), 0666 & ~umask());
         clearstatcache(true, $this->getPathname());
 
@@ -117,9 +109,7 @@ class PublicKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $command = "openssl x509 -in $in -inform $inForm -noout -subject";
-
-        $process = new Process($command);
+        $process = new Process("openssl x509 -in $in -inform $inForm -noout -subject");
         $process->mustRun();
 
         return trim(preg_replace('/^subject=/', '', $process->getOutput()));
@@ -137,9 +127,7 @@ class PublicKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $command = "openssl x509 -in $in -inform $inForm -noout -issuer";
-
-        $process = new Process($command);
+        $process = new Process("openssl x509 -in $in -inform $inForm -noout -issuer");
         $process->mustRun();
 
         return trim(preg_replace('/^issuer=/', '', $process->getOutput()));
@@ -157,9 +145,7 @@ class PublicKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $command = "openssl x509 -in $in -inform $inForm -noout -startdate";
-
-        $process = new Process($command);
+        $process = new Process("openssl x509 -in $in -inform $inForm -noout -startdate");
         $process->mustRun();
 
         return new \DateTime(trim(preg_replace('/^notBefore=/', '', $process->getOutput())));
@@ -177,9 +163,7 @@ class PublicKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $command = "openssl x509 -in $in -inform $inForm -noout -enddate";
-
-        $process = new Process($command);
+        $process = new Process("openssl x509 -in $in -inform $inForm -noout -enddate");
         $process->mustRun();
 
         return new \DateTime(trim(preg_replace('/^notAfter=/', '', $process->getOutput())));
@@ -211,14 +195,10 @@ class PublicKeyFile extends CryptoFile
         $inForm = escapeshellarg($this->getFormat());
         $outForm = escapeshellarg($format);
 
-        $command = "
-            openssl x509 -in $in -inform $inForm -out $in~ -outform $outForm &&
-            mv --force $in~ $in ||
-            rm --force $in~";
-
-        $process = new Process($command);
+        $process = new Process("openssl x509 -in $in -inform $inForm -outform $outForm");
         $process->mustRun();
 
+        @file_put_contents($this->getPathname(), $process->getOutput());
         @chmod($this->getPathname(), 0666 & ~umask());
         clearstatcache(true, $this->getPathname());
 
