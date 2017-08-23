@@ -60,7 +60,7 @@ composer install
 
 ## Dependencies
 
-* `openssl`, `mv` and `rm` shell commands
+* `openssl` shell command
 
 ## License
 
