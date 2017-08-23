@@ -97,6 +97,8 @@ class KeystoreFile extends CryptoFile
         $process = new Process($command);
         $process->mustRun();
 
+        @chmod($path, 0666 & ~umask());
+
         return new self($path);
     }
 
