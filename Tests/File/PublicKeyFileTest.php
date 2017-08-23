@@ -89,6 +89,20 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function testSanitizeProcessFailed()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
+
+        $publicKeyFile = new PublicKeyFile($this->file);
+
+        unlink($this->file);
+
+        $publicKeyFile->sanitize();
+    }
+
+    /**
      * @param string $path
      * @param string $format
      *
@@ -118,6 +132,20 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function testGetSubjectProcessFailed()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
+
+        $publicKeyFile = new PublicKeyFile($this->file);
+
+        unlink($this->file);
+
+        $this->assertSame(static::TEST_SUBJECT, $publicKeyFile->getSubject());
+    }
+
+    /**
      * @param string $path
      *
      * @dataProvider providerPublicKeys
@@ -129,6 +157,20 @@ class PublicKeyFileTest extends TestCase
         $publicKeyFile = new PublicKeyFile($this->file);
 
         $this->assertSame(static::TEST_ISSUER, $publicKeyFile->getIssuer());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function testGetIssuerProcessFailed()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
+
+        $publicKeyFile = new PublicKeyFile($this->file);
+
+        unlink($this->file);
+
+        $this->assertSame(static::TEST_SUBJECT, $publicKeyFile->getIssuer());
     }
 
     /**
@@ -149,6 +191,20 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function testGetNotBeforeProcessFailed()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
+
+        $publicKeyFile = new PublicKeyFile($this->file);
+
+        unlink($this->file);
+
+        $this->assertSame(static::TEST_SUBJECT, $publicKeyFile->getNotBefore());
+    }
+
+    /**
      * @param string $path
      *
      * @dataProvider providerPublicKeys
@@ -163,6 +219,20 @@ class PublicKeyFileTest extends TestCase
 
         $this->assertInstanceOf('DateTime', $notAfter);
         $this->assertSame(static::TEST_NOT_AFTER, $notAfter->format('Y-m-d H:i:s'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function testGetNotAfterProcessFailed()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
+
+        $publicKeyFile = new PublicKeyFile($this->file);
+
+        unlink($this->file);
+
+        $this->assertSame(static::TEST_SUBJECT, $publicKeyFile->getNotAfter());
     }
 
     /**
@@ -193,6 +263,20 @@ class PublicKeyFileTest extends TestCase
         $publicKeyFile = new PublicKeyFile($this->file);
 
         $publicKeyFile->convertFormat('invalid-format');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function testConvertFormatProcessFailed()
+    {
+        copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
+
+        $publicKeyFile = new PublicKeyFile($this->file);
+
+        unlink($this->file);
+
+        $publicKeyFile->convertFormat(PublicKeyFile::FORMAT_DER);
     }
 
     public function testMove()
