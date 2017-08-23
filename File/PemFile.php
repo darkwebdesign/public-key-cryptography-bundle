@@ -43,18 +43,14 @@ class PemFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        $command = "openssl x509 -in $in -noout";
-
-        $process = new Process($command);
+        $process = new Process("openssl x509 -in $in -noout");
         $process->run();
 
         if (!$process->isSuccessful()) {
             return false;
         }
 
-        $command = "openssl rsa -in $in -passin pass: -check -noout";
-
-        $process = new Process($command);
+        $process = new Process("openssl rsa -in $in -passin pass: -check -noout");
         $process->run();
 
         $badPasswordRead = false !== strpos($process->getErrorOutput(), ':bad password read:');
@@ -94,17 +90,13 @@ class PemFile extends CryptoFile
             $rsaPassOut = '';
         }
 
-        $command = "
-            {
-                openssl x509 -in $in
-                openssl rsa -in $in -passin pass:$pass $rsaPassOut
-            } > $in~ &&
-            mv --force $in~ $in ||
-            rm --force $in~";
+        $process1 = new Process("openssl x509 -in $in");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process("openssl rsa -in $in -passin pass:$pass $rsaPassOut");
+        $process2->mustRun();
 
+        @file_put_contents($this->getPathname(), $process1->getOutput() . $process2->getOutput());
         @chmod($this->getPathname(), 0666 & ~umask());
         clearstatcache(true, $this->getPathname());
 
@@ -147,17 +139,13 @@ class PemFile extends CryptoFile
             $rsaPassOut = '';
         }
 
-        $command = "
-            {
-                openssl x509 -in $publicKeyIn -inform $publicKeyInForm
-                openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass $rsaPassOut
-            } > $out~ &&
-            mv --force $out~ $out ||
-            rm --force $out~";
+        $process1 = new Process("openssl x509 -in $publicKeyIn -inform $publicKeyInForm");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process("openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass $rsaPassOut");
+        $process2->mustRun();
 
+        @file_put_contents($path, $process1->getOutput() . $process2->getOutput());
         @chmod($path, 0666 & ~umask());
 
         return new self($path);
@@ -181,14 +169,10 @@ class PemFile extends CryptoFile
         $keystorePass = escapeshellarg($keystorePassPhrase);
         $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
 
-        $command = "
-            openssl pkcs12 -in $in -passin pass:$privateKeyPass -out $out~ -passout pass:$keystorePass -export &&
-            mv --force $out~ $out ||
-            rm --force $out~";
-
-        $process = new Process($command);
+        $process = new Process("openssl pkcs12 -in $in -passin pass:$privateKeyPass -passout pass:$keystorePass -export");
         $process->mustRun();
 
+        @file_put_contents($path, $process->getOutput());
         @chmod($path, 0666 & ~umask());
 
         return new KeystoreFile($path);
@@ -208,14 +192,10 @@ class PemFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $out = escapeshellarg($path);
 
-        $command = "
-            openssl x509 -in $in -out $out~ &&
-            mv --force $out~ $out ||
-            rm --force $out~";
-
-        $process = new Process($command);
+        $process = new Process("openssl x509 -in $in");
         $process->mustRun();
 
+        @file_put_contents($path, $process->getOutput());
         @chmod($path, 0666 & ~umask());
 
         return new PublicKeyFile($path);
@@ -252,14 +232,10 @@ class PemFile extends CryptoFile
             $rsaPassOut = '';
         }
 
-        $command = "
-            openssl rsa -in $in -passin pass:$pass -out $out~ $rsaPassOut &&
-            mv --force $out~ $out ||
-            rm --force $out~";
-
-        $process = new Process($command);
+        $process = new Process("openssl rsa -in $in -passin pass:$pass $rsaPassOut");
         $process->mustRun();
 
+        @file_put_contents($path, $process->getOutput());
         @chmod($path, 0666 & ~umask());
 
         return new PrivateKeyFile($path);
@@ -276,9 +252,7 @@ class PemFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        $command = "openssl x509 -in $in -noout -subject";
-
-        $process = new Process($command);
+        $process = new Process("openssl x509 -in $in -noout -subject");
         $process->mustRun();
 
         return trim(preg_replace('/^subject=/', '', $process->getOutput()));
@@ -295,9 +269,7 @@ class PemFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        $command = "openssl x509 -in $in -noout -issuer";
-
-        $process = new Process($command);
+        $process = new Process("openssl x509 -in $in -noout -issuer");
         $process->mustRun();
 
         return trim(preg_replace('/^issuer=/', '', $process->getOutput()));
@@ -314,9 +286,7 @@ class PemFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        $command = "openssl x509 -in $in -noout -startdate";
-
-        $process = new Process($command);
+        $process = new Process("openssl x509 -in $in -noout -startdate");
         $process->mustRun();
 
         return new \DateTime(trim(preg_replace('/^notBefore=/', '', $process->getOutput())));
@@ -333,9 +303,7 @@ class PemFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        $command = "openssl x509 -in $in -noout -enddate";
-
-        $process = new Process($command);
+        $process = new Process("openssl x509 -in $in -noout -enddate");
         $process->mustRun();
 
         return new \DateTime(trim(preg_replace('/^notAfter=/', '', $process->getOutput())));
@@ -350,14 +318,13 @@ class PemFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        $command = "
-            openssl rsa -in $in -passin pass: -check -noout &&
-            openssl rsa -in $in -passin pass:nopass -check -noout";
+        $process1 = new Process("openssl rsa -in $in -passin pass: -check -noout");
+        $process1->run();
 
-        $process = new Process($command);
-        $process->run();
+        $process2 = new Process("openssl rsa -in $in -passin pass:nopass -check -noout");
+        $process2->run();
 
-        return !$process->isSuccessful();
+        return !$process1->isSuccessful() && !$process2->isSuccessful();
     }
 
     /**
@@ -375,9 +342,7 @@ class PemFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $command = "openssl rsa -in $in -passin pass:$pass -check -noout";
-
-        $process = new Process($command);
+        $process = new Process("openssl rsa -in $in -passin pass:$pass -check -noout");
         $process->run();
 
         return $process->isSuccessful();
@@ -405,17 +370,13 @@ class PemFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $command = "
-            {
-                openssl x509 -in $in
-                openssl rsa -in $in -passin pass: -passout pass:$pass -des3
-            } > $in~ &&
-            mv --force $in~ $in ||
-            rm --force $in~";
+        $process1 = new Process("openssl x509 -in $in");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process("openssl rsa -in $in -passin pass: -passout pass:$pass -des3");
+        $process2->mustRun();
 
+        @file_put_contents($this->getPathname(), $process1->getOutput() . $process2->getOutput());
         @chmod($this->getPathname(), 0666 & ~umask());
         clearstatcache(true, $this->getPathname());
 
@@ -436,17 +397,13 @@ class PemFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $command = "
-            {
-                openssl x509 -in $in
-                openssl rsa -in $in -passin pass:$pass
-            } > $in~ &&
-            mv --force $in~ $in ||
-            rm --force $in~";
+        $process1 = new Process("openssl x509 -in $in");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process("openssl rsa -in $in -passin pass:$pass");
+        $process2->mustRun();
 
+        @file_put_contents($this->getPathname(), $process1->getOutput() . $process2->getOutput());
         @chmod($this->getPathname(), 0666 & ~umask());
         clearstatcache(true, $this->getPathname());
 
@@ -477,17 +434,13 @@ class PemFile extends CryptoFile
         $pass = escapeshellarg($passPhrase);
         $newPass = escapeshellarg($newPassPhrase);
 
-        $command = "
-            {
-                openssl x509 -in $in
-                openssl rsa -in $in -passin pass:$pass -passout pass:$newPass -des3
-            } > $in~ &&
-            mv --force $in~ $in ||
-            rm --force $in~";
+        $process1 = new Process("openssl x509 -in $in");
+        $process1->mustRun();
 
-        $process = new Process($command);
-        $process->mustRun();
+        $process2 = new Process("openssl rsa -in $in -passin pass:$pass -passout pass:$newPass -des3");
+        $process2->mustRun();
 
+        @file_put_contents($this->getPathname(), $process1->getOutput() . $process2->getOutput());
         @chmod($this->getPathname(), 0666 & ~umask());
         clearstatcache(true, $this->getPathname());
 
