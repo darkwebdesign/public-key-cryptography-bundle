@@ -340,15 +340,15 @@ class PrivateKeyFileTest extends TestCase
      */
     public function providerPrivateKeys()
     {
-        return array(
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key'),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'),
-        );
+        return [
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key'],
+//            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'],
+        ];
     }
 
     /**
@@ -356,15 +356,15 @@ class PrivateKeyFileTest extends TestCase
      */
     public function providerPrivateKeysAndPassPhrases()
     {
-        return array(
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', static::TEST_PASSPHRASE),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', static::TEST_PASSPHRASE),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', static::TEST_PASSPHRASE),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'),
-        );
+        return [
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', static::TEST_PASSPHRASE],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', static::TEST_PASSPHRASE],
+//            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', static::TEST_PASSPHRASE],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'],
+        ];
     }
 
     /**
@@ -372,15 +372,15 @@ class PrivateKeyFileTest extends TestCase
      */
     public function providerPrivateKeysAndFormats()
     {
-        return array(
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', PrivateKeyFile::FORMAT_PEM),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key', PrivateKeyFile::FORMAT_PEM),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key', PrivateKeyFile::FORMAT_DER),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', PrivateKeyFile::FORMAT_PEM),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', PrivateKeyFile::FORMAT_DER),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key', PrivateKeyFile::FORMAT_PEM),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key', PrivateKeyFile::FORMAT_DER),
-        );
+        return [
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', PrivateKeyFile::FORMAT_PEM],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key', PrivateKeyFile::FORMAT_PEM],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key', PrivateKeyFile::FORMAT_DER],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', PrivateKeyFile::FORMAT_PEM],
+//            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', PrivateKeyFile::FORMAT_DER],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key', PrivateKeyFile::FORMAT_PEM],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key', PrivateKeyFile::FORMAT_DER],
+        ];
     }
 
     /**
@@ -388,11 +388,11 @@ class PrivateKeyFileTest extends TestCase
      */
     public function providerPrivateKeysHavingPassPhrases()
     {
-        return array(
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key'),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key'),
-        );
+        return [
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key'],
+//            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key'],
+        ];
     }
 
     /**
@@ -400,12 +400,12 @@ class PrivateKeyFileTest extends TestCase
      */
     public function providerPrivateKeysNotHavingPassPhrases()
     {
-        return array(
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'),
-        );
+        return [
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'],
+//            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'],
+//            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'],
+        ];
     }
 
     /**
@@ -413,14 +413,14 @@ class PrivateKeyFileTest extends TestCase
      */
     public function providerNotPrivateKeys()
     {
-        return array(
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs12-emptypass.p12'),
-            array(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem'),
-            array(__DIR__ . '/../Fixtures/Certificates/pem-nopass.pem'),
-            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt'),
-            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt'),
-        );
+        return [
+            [__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs12-emptypass.p12'],
+            [__DIR__ . '/../Fixtures/Certificates/pem-pass.pem'],
+            [__DIR__ . '/../Fixtures/Certificates/pem-nopass.pem'],
+            [__DIR__ . '/../Fixtures/Certificates/x509-pem.crt'],
+            [__DIR__ . '/../Fixtures/Certificates/x509-der.crt'],
+        ];
     }
 
     /**
@@ -428,22 +428,22 @@ class PrivateKeyFileTest extends TestCase
      */
     public function providerConvertFormat()
     {
-        return array(
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', PrivateKeyFile::FORMAT_PEM, static::TEST_PASSPHRASE),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', PrivateKeyFile::FORMAT_DER, static::TEST_PASSPHRASE),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key', PrivateKeyFile::FORMAT_PEM),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key', PrivateKeyFile::FORMAT_DER),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key', PrivateKeyFile::FORMAT_PEM),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key', PrivateKeyFile::FORMAT_DER),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', PrivateKeyFile::FORMAT_PEM, static::TEST_PASSPHRASE),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', PrivateKeyFile::FORMAT_DER, static::TEST_PASSPHRASE),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', PrivateKeyFile::FORMAT_PEM, static::TEST_PASSPHRASE),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', PrivateKeyFile::FORMAT_DER, static::TEST_PASSPHRASE),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key', PrivateKeyFile::FORMAT_PEM),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key', PrivateKeyFile::FORMAT_DER),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key', PrivateKeyFile::FORMAT_PEM),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key', PrivateKeyFile::FORMAT_DER),
-        );
+        return [
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', PrivateKeyFile::FORMAT_PEM, static::TEST_PASSPHRASE],
+//            [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', PrivateKeyFile::FORMAT_DER, static::TEST_PASSPHRASE],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key', PrivateKeyFile::FORMAT_PEM],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key', PrivateKeyFile::FORMAT_DER],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key', PrivateKeyFile::FORMAT_PEM],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key', PrivateKeyFile::FORMAT_DER],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', PrivateKeyFile::FORMAT_PEM, static::TEST_PASSPHRASE],
+//            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', PrivateKeyFile::FORMAT_DER, static::TEST_PASSPHRASE],
+//            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', PrivateKeyFile::FORMAT_PEM, static::TEST_PASSPHRASE],
+//            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', PrivateKeyFile::FORMAT_DER, static::TEST_PASSPHRASE],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key', PrivateKeyFile::FORMAT_PEM],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key', PrivateKeyFile::FORMAT_DER],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key', PrivateKeyFile::FORMAT_PEM],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key', PrivateKeyFile::FORMAT_DER],
+        ];
     }
 
     /**
@@ -451,14 +451,14 @@ class PrivateKeyFileTest extends TestCase
      */
     public function providerHasPassPhrase()
     {
-        return array(
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', true),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key', false),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key', false),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', true),
-//            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', true),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key', false),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key', false),
-        );
+        return [
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', true],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key', false],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key', false],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key', true],
+//            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key', true],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key', false],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key', false],
+        ];
     }
 }
