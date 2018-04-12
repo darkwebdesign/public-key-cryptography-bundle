@@ -70,7 +70,6 @@ class KeystoreFile extends CryptoFile
      */
     public static function create($path, $passPhrase, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, $privateKeyPassPhrase = null)
     {
-        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
         $publicKeyIn = escapeshellarg($publicKeyFile->getPathname());
         $publicKeyInForm = escapeshellarg($publicKeyFile->getFormat());
@@ -107,7 +106,6 @@ class KeystoreFile extends CryptoFile
     public function getPem($path, $passPhrase)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
 
         // if the keystore pass phrase is an empty string, the outputted private key will not contain a pass phrase
@@ -150,7 +148,6 @@ class KeystoreFile extends CryptoFile
     public function getPublicKey($path, $passPhrase)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
 
         $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
@@ -182,7 +179,6 @@ class KeystoreFile extends CryptoFile
     public function getPrivateKey($path, $passPhrase)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
 
         // if the keystore pass phrase is an empty string, the outputted private key will not contain a pass phrase

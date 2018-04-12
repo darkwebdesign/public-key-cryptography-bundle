@@ -122,7 +122,6 @@ class PemFile extends CryptoFile
             throw new PrivateKeyPassPhraseEmptyException();
         }
 
-        $out = escapeshellarg($path);
         $publicKeyIn = escapeshellarg($publicKeyFile->getPathname());
         $publicKeyInForm = escapeshellarg($publicKeyFile->getFormat());
         $privateKeyIn = escapeshellarg($privateKeyFile->getPathname());
@@ -161,7 +160,6 @@ class PemFile extends CryptoFile
     public function getKeystore($path, $keystorePassPhrase, $privateKeyPassPhrase = null)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($path);
         $keystorePass = escapeshellarg($keystorePassPhrase);
         $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
 
@@ -186,7 +184,6 @@ class PemFile extends CryptoFile
     public function getPublicKey($path)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($path);
 
         $process = new Process("openssl x509 -in $in");
         $process->mustRun();
@@ -219,7 +216,6 @@ class PemFile extends CryptoFile
         }
 
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
 
         if (null !== $passPhrase) {
