@@ -22,7 +22,6 @@ namespace DarkWebDesign\PublicKeyCryptographyBundle\Tests\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\File\File;
 
 class PublicKeyFileTest extends TestCase
 {

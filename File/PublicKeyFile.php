@@ -21,9 +21,6 @@
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\CryptoFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
 use Symfony\Component\Process\Process;
 
 /**
