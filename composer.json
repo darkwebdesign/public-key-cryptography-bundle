@@ -9,9 +9,9 @@
         {"name": "Raymond Schouten"}
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/http-foundation": "^2.3",
-        "symfony/process": "^2.3"
+        "php": ">=5.5.9",
+        "symfony/http-foundation": "^3.0",
+        "symfony/process": "^3.0"
     },
     "require-dev": {
         "codeclimate/php-test-reporter": "^0.3.2",
