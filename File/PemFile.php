@@ -21,10 +21,6 @@
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\CryptoFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
 use Symfony\Component\Process\Process;
 
 /**
