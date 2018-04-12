@@ -294,10 +294,10 @@ class PublicKeyFileTest extends TestCase
      */
     public function providerPublicKeys()
     {
-        return array(
-            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt'),
-            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt'),
-        );
+        return [
+            [__DIR__ . '/../Fixtures/Certificates/x509-pem.crt'],
+            [__DIR__ . '/../Fixtures/Certificates/x509-der.crt'],
+        ];
     }
 
     /**
@@ -305,19 +305,19 @@ class PublicKeyFileTest extends TestCase
      */
     public function providerNotPublicKeys()
     {
-        return array(
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs12-emptypass.p12'),
-            array(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem'),
-            array(__DIR__ . '/../Fixtures/Certificates/pem-nopass.pem'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'),
-            array(__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'),
-        );
+        return [
+            [__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs12-emptypass.p12'],
+            [__DIR__ . '/../Fixtures/Certificates/pem-pass.pem'],
+            [__DIR__ . '/../Fixtures/Certificates/pem-nopass.pem'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-der.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-pem.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-pass-der.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-pem.key'],
+            [__DIR__ . '/../Fixtures/Certificates/pkcs8-nopass-der.key'],
+        ];
     }
 
     /**
@@ -325,10 +325,10 @@ class PublicKeyFileTest extends TestCase
      */
     public function providerPublicKeysAndFormats()
     {
-        return array(
-            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', PublicKeyFile::FORMAT_PEM),
-            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', PublicKeyFile::FORMAT_DER),
-        );
+        return [
+            [__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', PublicKeyFile::FORMAT_PEM],
+            [__DIR__ . '/../Fixtures/Certificates/x509-der.crt', PublicKeyFile::FORMAT_DER],
+        ];
     }
 
     /**
@@ -336,11 +336,11 @@ class PublicKeyFileTest extends TestCase
      */
     public function providerConvertFormat()
     {
-        return array(
-            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', PublicKeyFile::FORMAT_PEM),
-            array(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', PublicKeyFile::FORMAT_DER),
-            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', PublicKeyFile::FORMAT_PEM),
-            array(__DIR__ . '/../Fixtures/Certificates/x509-der.crt', PublicKeyFile::FORMAT_DER),
-        );
+        return [
+            [__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', PublicKeyFile::FORMAT_PEM],
+            [__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', PublicKeyFile::FORMAT_DER],
+            [__DIR__ . '/../Fixtures/Certificates/x509-der.crt', PublicKeyFile::FORMAT_PEM],
+            [__DIR__ . '/../Fixtures/Certificates/x509-der.crt', PublicKeyFile::FORMAT_DER],
+        ];
     }
 }
