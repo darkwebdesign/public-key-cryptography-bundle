@@ -21,9 +21,6 @@
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\CryptoFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
 use Symfony\Component\Process\Process;
 
 /**
@@ -53,12 +50,12 @@ class PublicKeyFile extends CryptoFile
             return false;
         }
 
-        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass: -check -noout");
+        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass:anypass -check -noout");
         $process->run();
 
-        $badPasswordRead = false !== strpos($process->getErrorOutput(), ':bad password read:');
+        $badDecrypt = false !== strpos($process->getErrorOutput(), ':bad decrypt:');
 
-        if ($process->isSuccessful() || $badPasswordRead) {
+        if ($process->isSuccessful() || $badDecrypt) {
             return false;
         }
 

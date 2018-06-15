@@ -20,12 +20,6 @@
 
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
-use DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\CryptoFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
 /**
@@ -44,7 +38,7 @@ class KeystoreFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        $process = new Process("openssl pkcs12 -in $in -passin pass: -noout");
+        $process = new Process("openssl pkcs12 -in $in -passin pass:anypass -noout");
         $process->run();
 
         $invalidPassword = false !== strpos($process->getErrorOutput(), 'invalid password');
@@ -75,7 +69,6 @@ class KeystoreFile extends CryptoFile
      */
     public static function create($path, $passPhrase, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, $privateKeyPassPhrase = null)
     {
-        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
         $publicKeyIn = escapeshellarg($publicKeyFile->getPathname());
         $publicKeyInForm = escapeshellarg($publicKeyFile->getFormat());
@@ -112,7 +105,6 @@ class KeystoreFile extends CryptoFile
     public function getPem($path, $passPhrase)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
 
         // if the keystore pass phrase is an empty string, the outputted private key will not contain a pass phrase
@@ -155,7 +147,6 @@ class KeystoreFile extends CryptoFile
     public function getPublicKey($path, $passPhrase)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
 
         $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
@@ -187,7 +178,6 @@ class KeystoreFile extends CryptoFile
     public function getPrivateKey($path, $passPhrase)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
 
         // if the keystore pass phrase is an empty string, the outputted private key will not contain a pass phrase
@@ -332,7 +322,6 @@ class KeystoreFile extends CryptoFile
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile
      *
-     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function changePassPhrase($passPhrase, $newPassPhrase)

@@ -21,10 +21,6 @@
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\CryptoFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
 use Symfony\Component\Process\Process;
 
 /**
@@ -50,12 +46,12 @@ class PemFile extends CryptoFile
             return false;
         }
 
-        $process = new Process("openssl rsa -in $in -passin pass: -check -noout");
+        $process = new Process("openssl rsa -in $in -passin pass:anypass -check -noout");
         $process->run();
 
-        $badPasswordRead = false !== strpos($process->getErrorOutput(), ':bad password read:');
+        $badDecrypt = false !== strpos($process->getErrorOutput(), ':bad decrypt:');
 
-        if (!$process->isSuccessful() && !$badPasswordRead) {
+        if (!$process->isSuccessful() && !$badDecrypt) {
             return false;
         }
 
@@ -126,7 +122,6 @@ class PemFile extends CryptoFile
             throw new PrivateKeyPassPhraseEmptyException();
         }
 
-        $out = escapeshellarg($path);
         $publicKeyIn = escapeshellarg($publicKeyFile->getPathname());
         $publicKeyInForm = escapeshellarg($publicKeyFile->getFormat());
         $privateKeyIn = escapeshellarg($privateKeyFile->getPathname());
@@ -165,7 +160,6 @@ class PemFile extends CryptoFile
     public function getKeystore($path, $keystorePassPhrase, $privateKeyPassPhrase = null)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($path);
         $keystorePass = escapeshellarg($keystorePassPhrase);
         $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
 
@@ -190,7 +184,6 @@ class PemFile extends CryptoFile
     public function getPublicKey($path)
     {
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($path);
 
         $process = new Process("openssl x509 -in $in");
         $process->mustRun();
@@ -223,7 +216,6 @@ class PemFile extends CryptoFile
         }
 
         $in = escapeshellarg($this->getPathname());
-        $out = escapeshellarg($path);
         $pass = escapeshellarg($passPhrase);
 
         if (null !== $passPhrase) {
@@ -318,10 +310,10 @@ class PemFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        $process1 = new Process("openssl rsa -in $in -passin pass: -check -noout");
+        $process1 = new Process("openssl rsa -in $in -passin pass:nopass -check -noout");
         $process1->run();
 
-        $process2 = new Process("openssl rsa -in $in -passin pass:nopass -check -noout");
+        $process2 = new Process("openssl rsa -in $in -passin pass:anypass -check -noout");
         $process2->run();
 
         return !$process1->isSuccessful() && !$process2->isSuccessful();
@@ -373,7 +365,7 @@ class PemFile extends CryptoFile
         $process1 = new Process("openssl x509 -in $in");
         $process1->mustRun();
 
-        $process2 = new Process("openssl rsa -in $in -passin pass: -passout pass:$pass -des3");
+        $process2 = new Process("openssl rsa -in $in -passin pass:nopass -passout pass:$pass -des3");
         $process2->mustRun();
 
         @file_put_contents($this->getPathname(), $process1->getOutput() . $process2->getOutput());
