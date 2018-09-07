@@ -22,9 +22,6 @@ namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException;
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\CryptoFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile;
-use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
 use Symfony\Component\Process\Process;
 
 /**
@@ -51,12 +48,12 @@ class PrivateKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass: -check -noout");
+        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass:anypass -check -noout");
         $process->run();
 
-        $badPasswordRead = false !== strpos($process->getErrorOutput(), ':bad password read:');
+        $badDecrypt = false !== strpos($process->getErrorOutput(), ':bad decrypt:');
 
-        if (!$process->isSuccessful() && !$badPasswordRead) {
+        if (!$process->isSuccessful() && !$badDecrypt) {
             return false;
         }
 
@@ -186,10 +183,10 @@ class PrivateKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $process1 = new Process("openssl rsa -in $in -inform $inForm -passin pass: -check -noout");
+        $process1 = new Process("openssl rsa -in $in -inform $inForm -passin pass:nopass -check -noout");
         $process1->run();
 
-        $process2 = new Process("openssl rsa -in $in -inform $inForm -passin pass:nopass -check -noout");
+        $process2 = new Process("openssl rsa -in $in -inform $inForm -passin pass:anypass -check -noout");
         $process2->run();
 
         return !$process1->isSuccessful() && !$process2->isSuccessful();
@@ -245,7 +242,7 @@ class PrivateKeyFile extends CryptoFile
         $inForm = escapeshellarg($this->getFormat());
         $pass = escapeshellarg($passPhrase);
 
-        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass: -outform $inForm -passout pass:$pass -des3");
+        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass:nopass -outform $inForm -passout pass:$pass -des3");
         $process->mustRun();
 
         @file_put_contents($this->getPathname(), $process->getOutput());
