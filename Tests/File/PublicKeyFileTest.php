@@ -25,8 +25,10 @@ use PHPUnit\Framework\TestCase;
 
 class PublicKeyFileTest extends TestCase
 {
-    const TEST_SUBJECT = '/C=DE/ST=Bavaria/L=Munich/O=MIT-xperts GmbH/OU=TEST CA/CN=testbox.mit-xperts.com/emailAddress=info@mit-xperts.com';
-    const TEST_ISSUER = '/C=DE/ST=Bavaria/L=Munich/O=MIT-xperts GmbH/OU=HBBTV-DEMO-CA/CN=itv.mit-xperts.com/emailAddress=info@mit-xperts.com';
+    const TEST_SUBJECT_V1_0_0_BETA1 = '/C=DE/ST=Bavaria/L=Munich/O=MIT-xperts GmbH/OU=TEST CA/CN=testbox.mit-xperts.com/emailAddress=info@mit-xperts.com';
+    const TEST_SUBJECT_V1_1_0_PRE1 = 'C = DE, ST = Bavaria, L = Munich, O = MIT-xperts GmbH, OU = TEST CA, CN = testbox.mit-xperts.com, emailAddress = info@mit-xperts.com';
+    const TEST_ISSUER_V1_0_0_BETA1 = '/C=DE/ST=Bavaria/L=Munich/O=MIT-xperts GmbH/OU=HBBTV-DEMO-CA/CN=itv.mit-xperts.com/emailAddress=info@mit-xperts.com';
+    const TEST_ISSUER_V1_1_0_PRE1 = 'C = DE, ST = Bavaria, L = Munich, O = MIT-xperts GmbH, OU = HBBTV-DEMO-CA, CN = itv.mit-xperts.com, emailAddress = info@mit-xperts.com';
     const TEST_NOT_BEFORE = '2012-09-23 17:21:33';
     const TEST_NOT_AFTER = '2017-09-22 17:21:33';
 
@@ -127,7 +129,12 @@ class PublicKeyFileTest extends TestCase
 
         $publicKeyFile = new PublicKeyFile($this->file);
 
-        $this->assertSame(static::TEST_SUBJECT, $publicKeyFile->getSubject());
+        $subject = $publicKeyFile->getSubject();
+
+        $this->assertThat($subject, $this->logicalOr(
+            $this->identicalTo(static::TEST_SUBJECT_V1_1_0_PRE1),
+            $this->identicalTo(static::TEST_SUBJECT_V1_0_0_BETA1)
+        ));
     }
 
     /**
@@ -141,7 +148,7 @@ class PublicKeyFileTest extends TestCase
 
         unlink($this->file);
 
-        $this->assertSame(static::TEST_SUBJECT, $publicKeyFile->getSubject());
+        $publicKeyFile->getSubject();
     }
 
     /**
@@ -155,7 +162,12 @@ class PublicKeyFileTest extends TestCase
 
         $publicKeyFile = new PublicKeyFile($this->file);
 
-        $this->assertSame(static::TEST_ISSUER, $publicKeyFile->getIssuer());
+        $issuer = $publicKeyFile->getIssuer();
+
+        $this->assertThat($issuer, $this->logicalOr(
+            $this->identicalTo(static::TEST_ISSUER_V1_1_0_PRE1),
+            $this->identicalTo(static::TEST_ISSUER_V1_0_0_BETA1)
+        ));
     }
 
     /**
@@ -169,7 +181,7 @@ class PublicKeyFileTest extends TestCase
 
         unlink($this->file);
 
-        $this->assertSame(static::TEST_SUBJECT, $publicKeyFile->getIssuer());
+        $publicKeyFile->getIssuer();
     }
 
     /**
@@ -200,7 +212,7 @@ class PublicKeyFileTest extends TestCase
 
         unlink($this->file);
 
-        $this->assertSame(static::TEST_SUBJECT, $publicKeyFile->getNotBefore());
+        $publicKeyFile->getNotBefore();
     }
 
     /**
@@ -231,7 +243,7 @@ class PublicKeyFileTest extends TestCase
 
         unlink($this->file);
 
-        $this->assertSame(static::TEST_SUBJECT, $publicKeyFile->getNotAfter());
+        $publicKeyFile->getNotAfter();
     }
 
     /**

@@ -24,14 +24,15 @@ use DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class KeystoreFileTest extends TestCase
 {
     const TEST_PASSPHRASE = 'test';
     const TEST_EMPTYPASSPHRASE = '';
-    const TEST_SUBJECT = '/C=DE/ST=Bavaria/L=Munich/O=MIT-xperts GmbH/OU=TEST CA/CN=testbox.mit-xperts.com/emailAddress=info@mit-xperts.com';
-    const TEST_ISSUER = '/C=DE/ST=Bavaria/L=Munich/O=MIT-xperts GmbH/OU=HBBTV-DEMO-CA/CN=itv.mit-xperts.com/emailAddress=info@mit-xperts.com';
+    const TEST_SUBJECT_V1_0_0_BETA1 = '/C=DE/ST=Bavaria/L=Munich/O=MIT-xperts GmbH/OU=TEST CA/CN=testbox.mit-xperts.com/emailAddress=info@mit-xperts.com';
+    const TEST_SUBJECT_V1_1_0_PRE1 = 'C = DE, ST = Bavaria, L = Munich, O = MIT-xperts GmbH, OU = TEST CA, CN = testbox.mit-xperts.com, emailAddress = info@mit-xperts.com';
+    const TEST_ISSUER_V1_0_0_BETA1 = '/C=DE/ST=Bavaria/L=Munich/O=MIT-xperts GmbH/OU=HBBTV-DEMO-CA/CN=itv.mit-xperts.com/emailAddress=info@mit-xperts.com';
+    const TEST_ISSUER_V1_1_0_PRE1 = 'C = DE, ST = Bavaria, L = Munich, O = MIT-xperts GmbH, OU = HBBTV-DEMO-CA, CN = itv.mit-xperts.com, emailAddress = info@mit-xperts.com';
     const TEST_NOT_BEFORE = '2012-09-23 17:21:33';
     const TEST_NOT_AFTER = '2017-09-22 17:21:33';
 
@@ -210,7 +211,10 @@ class KeystoreFileTest extends TestCase
 
         $subject = $keystoreFile->getSubject($passPhrase);
 
-        $this->assertSame(static::TEST_SUBJECT, $subject);
+        $this->assertThat($subject, $this->logicalOr(
+            $this->identicalTo(static::TEST_SUBJECT_V1_1_0_PRE1),
+            $this->identicalTo(static::TEST_SUBJECT_V1_0_0_BETA1)
+        ));
     }
 
     /**
@@ -239,7 +243,10 @@ class KeystoreFileTest extends TestCase
 
         $issuer = $keystoreFile->getIssuer($passPhrase);
 
-        $this->assertSame(static::TEST_ISSUER, $issuer);
+        $this->assertThat($issuer, $this->logicalOr(
+            $this->identicalTo(static::TEST_ISSUER_V1_1_0_PRE1),
+            $this->identicalTo(static::TEST_ISSUER_V1_0_0_BETA1)
+        ));
     }
 
     /**
