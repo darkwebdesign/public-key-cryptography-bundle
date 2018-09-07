@@ -20,7 +20,6 @@
 
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
 /**
@@ -39,7 +38,7 @@ class KeystoreFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        $process = new Process("openssl pkcs12 -in $in -passin pass: -noout");
+        $process = new Process("openssl pkcs12 -in $in -passin pass:anypass -noout");
         $process->run();
 
         $invalidPassword = false !== strpos($process->getErrorOutput(), 'invalid password');
@@ -323,7 +322,6 @@ class KeystoreFile extends CryptoFile
      *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile
      *
-     * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function changePassPhrase($passPhrase, $newPassPhrase)
