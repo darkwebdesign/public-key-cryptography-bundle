@@ -18,6 +18,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Tests\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
@@ -48,11 +50,13 @@ class PrivateKeyFileTest extends TestCase
      *
      * @dataProvider providerPrivateKeys
      */
-    public function testNewInstance($path)
+    public function testNewInstance(string $path)
     {
         copy($path, $this->file);
 
-        new PrivateKeyFile($this->file);
+        $privateKeyFile = new PrivateKeyFile($this->file);
+
+        $this->assertInstanceOf(PrivateKeyFile::class, $privateKeyFile);
     }
 
     /**
@@ -62,7 +66,7 @@ class PrivateKeyFileTest extends TestCase
      *
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
-    public function testNewInstanceNotPrivateKey($path)
+    public function testNewInstanceNotPrivateKey(string $path)
     {
         copy($path, $this->file);
 
@@ -75,7 +79,7 @@ class PrivateKeyFileTest extends TestCase
      *
      * @dataProvider providerPrivateKeysAndPassPhrases
      */
-    public function testSanitize($path, $passPhrase = null)
+    public function testSanitize(string $path, string $passPhrase = null)
     {
         copy($path, $this->file);
 
@@ -83,7 +87,7 @@ class PrivateKeyFileTest extends TestCase
 
         $privateKeyFile = $privateKeyFile->sanitize($passPhrase);
 
-        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile', $privateKeyFile);
+        $this->assertInstanceOf(PrivateKeyFile::class, $privateKeyFile);
     }
 
     /**
@@ -116,7 +120,7 @@ class PrivateKeyFileTest extends TestCase
      *
      * @dataProvider providerPrivateKeysAndFormats
      */
-    public function testGetFormat($path, $format)
+    public function testGetFormat(string $path, string $format)
     {
         copy($path, $this->file);
 
@@ -132,7 +136,7 @@ class PrivateKeyFileTest extends TestCase
      *
      * @dataProvider providerConvertFormat
      */
-    public function testConvertFormat($path, $format, $passPhrase = null)
+    public function testConvertFormat(string $path, string $format, string $passPhrase = null)
     {
         copy($path, $this->file);
 
@@ -140,7 +144,7 @@ class PrivateKeyFileTest extends TestCase
 
         $privateKeyFile = $privateKeyFile->convertFormat($format, $passPhrase);
 
-        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile', $privateKeyFile);
+        $this->assertInstanceOf(PrivateKeyFile::class, $privateKeyFile);
         $this->assertSame($format, $privateKeyFile->getFormat());
         $this->assertSame(null !== $passPhrase, $privateKeyFile->hasPassPhrase());
     }
@@ -183,11 +187,11 @@ class PrivateKeyFileTest extends TestCase
 
     /**
      * @param string $path
-     * @param bool $privateKeyHasPassphrase
+     * @param bool $hasPassphrase
      *
      * @dataProvider providerHasPassPhrase
      */
-    public function testHasPassPhrase($path, $hasPassphrase)
+    public function testHasPassPhrase(string $path, bool $hasPassphrase)
     {
         copy($path, $this->file);
 
@@ -201,7 +205,7 @@ class PrivateKeyFileTest extends TestCase
      *
      * @dataProvider providerPrivateKeysHavingPassPhrases
      */
-    public function testVerifyPassPhrase($path)
+    public function testVerifyPassPhrase(string $path)
     {
         copy($path, $this->file);
 
@@ -216,7 +220,7 @@ class PrivateKeyFileTest extends TestCase
      *
      * @dataProvider providerPrivateKeysNotHavingPassPhrases
      */
-    public function testAddPassPhrase($path)
+    public function testAddPassPhrase(string $path)
     {
         copy($path, $this->file);
 
@@ -259,7 +263,7 @@ class PrivateKeyFileTest extends TestCase
      *
      * @dataProvider providerPrivateKeysHavingPassPhrases
      */
-    public function testRemovePassPhrase($path)
+    public function testRemovePassPhrase(string $path)
     {
         copy($path, $this->file);
 
@@ -287,7 +291,7 @@ class PrivateKeyFileTest extends TestCase
      *
      * @dataProvider providerPrivateKeysHavingPassPhrases
      */
-    public function testChangePassPhrase($path)
+    public function testChangePassPhrase(string $path)
     {
         copy($path, $this->file);
 
@@ -332,13 +336,13 @@ class PrivateKeyFileTest extends TestCase
 
         $privateKeyFile = $privateKeyFile->move($privateKeyFile->getPath(), $privateKeyFile->getFilename());
 
-        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile', $privateKeyFile);
+        $this->assertInstanceOf(PrivateKeyFile::class, $privateKeyFile);
     }
 
     /**
      * return array[]
      */
-    public function providerPrivateKeys()
+    public function providerPrivateKeys(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key'],
@@ -354,7 +358,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerPrivateKeysAndPassPhrases()
+    public function providerPrivateKeysAndPassPhrases(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', static::TEST_PASSPHRASE],
@@ -370,7 +374,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerPrivateKeysAndFormats()
+    public function providerPrivateKeysAndFormats(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', PrivateKeyFile::FORMAT_PEM],
@@ -386,7 +390,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * @return array[]
      */
-    public function providerPrivateKeysHavingPassPhrases()
+    public function providerPrivateKeysHavingPassPhrases(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key'],
@@ -398,7 +402,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * @return array[]
      */
-    public function providerPrivateKeysNotHavingPassPhrases()
+    public function providerPrivateKeysNotHavingPassPhrases(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key'],
@@ -411,7 +415,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerNotPrivateKeys()
+    public function providerNotPrivateKeys(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12'],
@@ -426,7 +430,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerConvertFormat()
+    public function providerConvertFormat(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', PrivateKeyFile::FORMAT_PEM, static::TEST_PASSPHRASE],
@@ -449,7 +453,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerHasPassPhrase()
+    public function providerHasPassPhrase(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', true],

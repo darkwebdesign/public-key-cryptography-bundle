@@ -18,6 +18,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException;
@@ -35,7 +37,7 @@ class PemFile extends CryptoFile
      *
      * @return bool
      */
-    protected function validate()
+    protected function validate(): bool
     {
         $in = escapeshellarg($this->getPathname());
 
@@ -71,14 +73,14 @@ class PemFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function sanitize($passPhrase = null)
+    public function sanitize(string $passPhrase = null): PemFile
     {
         if ('' === $passPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
         }
 
         $in = escapeshellarg($this->getPathname());
-        $pass = escapeshellarg($passPhrase);
+        $pass = escapeshellarg((string) $passPhrase);
 
         if (null !== $passPhrase) {
             $rsaPassOut = "-passout pass:$pass -des3";
@@ -116,7 +118,7 @@ class PemFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public static function create($path, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, $privateKeyPassPhrase = null)
+    public static function create(string $path, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, string $privateKeyPassPhrase = null): PemFile
     {
         if ('' === $privateKeyPassPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
@@ -126,7 +128,7 @@ class PemFile extends CryptoFile
         $publicKeyInForm = escapeshellarg($publicKeyFile->getFormat());
         $privateKeyIn = escapeshellarg($privateKeyFile->getPathname());
         $privateKeyInForm = escapeshellarg($privateKeyFile->getFormat());
-        $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
+        $privateKeyPass = escapeshellarg((string) $privateKeyPassPhrase);
 
         if (null !== $privateKeyPassPhrase) {
             $rsaPassOut = "-passout pass:$privateKeyPass -des3";
@@ -157,11 +159,11 @@ class PemFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getKeystore($path, $keystorePassPhrase, $privateKeyPassPhrase = null)
+    public function getKeystore(string $path, string $keystorePassPhrase, string $privateKeyPassPhrase = null): KeystoreFile
     {
         $in = escapeshellarg($this->getPathname());
         $keystorePass = escapeshellarg($keystorePassPhrase);
-        $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
+        $privateKeyPass = escapeshellarg((string) $privateKeyPassPhrase);
 
         $process = new Process("openssl pkcs12 -in $in -passin pass:$privateKeyPass -passout pass:$keystorePass -export");
         $process->mustRun();
@@ -181,7 +183,7 @@ class PemFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPublicKey($path)
+    public function getPublicKey(string $path): PublicKeyFile
     {
         $in = escapeshellarg($this->getPathname());
 
@@ -209,14 +211,14 @@ class PemFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPrivateKey($path, $passPhrase = null)
+    public function getPrivateKey(string $path, string $passPhrase = null): PrivateKeyFile
     {
         if ('' === $passPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
         }
 
         $in = escapeshellarg($this->getPathname());
-        $pass = escapeshellarg($passPhrase);
+        $pass = escapeshellarg((string) $passPhrase);
 
         if (null !== $passPhrase) {
             $rsaPassOut = "-passout pass:$pass -des3";
@@ -240,7 +242,7 @@ class PemFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getSubject()
+    public function getSubject(): string
     {
         $in = escapeshellarg($this->getPathname());
 
@@ -257,7 +259,7 @@ class PemFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getIssuer()
+    public function getIssuer(): string
     {
         $in = escapeshellarg($this->getPathname());
 
@@ -274,7 +276,7 @@ class PemFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getNotBefore()
+    public function getNotBefore(): \DateTime
     {
         $in = escapeshellarg($this->getPathname());
 
@@ -291,7 +293,7 @@ class PemFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getNotAfter()
+    public function getNotAfter(): \DateTime
     {
         $in = escapeshellarg($this->getPathname());
 
@@ -306,7 +308,7 @@ class PemFile extends CryptoFile
      *
      * @return bool
      */
-    public function hasPassPhrase()
+    public function hasPassPhrase(): bool
     {
         $in = escapeshellarg($this->getPathname());
 
@@ -329,7 +331,7 @@ class PemFile extends CryptoFile
      *
      * @return bool
      */
-    public function verifyPassPhrase($passPhrase)
+    public function verifyPassPhrase(string $passPhrase): bool
     {
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
@@ -353,7 +355,7 @@ class PemFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function addPassPhrase($passPhrase)
+    public function addPassPhrase(string $passPhrase): PemFile
     {
         if ('' === $passPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
@@ -384,7 +386,7 @@ class PemFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function removePassPhrase($passPhrase)
+    public function removePassPhrase(string $passPhrase): PemFile
     {
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
@@ -416,7 +418,7 @@ class PemFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function changePassPhrase($passPhrase, $newPassPhrase)
+    public function changePassPhrase(string $passPhrase, string $newPassPhrase): PemFile
     {
         if ('' === $newPassPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
@@ -449,7 +451,7 @@ class PemFile extends CryptoFile
      *
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
-    public function move($directory, $name = null)
+    public function move($directory, $name = null): PemFile
     {
         $file = parent::move($directory, $name);
 

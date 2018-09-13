@@ -18,6 +18,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException;
@@ -38,7 +40,7 @@ class PublicKeyFile extends CryptoFile
      *
      * @return bool
      */
-    protected function validate()
+    protected function validate(): bool
     {
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
@@ -69,7 +71,7 @@ class PublicKeyFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function sanitize()
+    public function sanitize(): PublicKeyFile
     {
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
@@ -89,7 +91,7 @@ class PublicKeyFile extends CryptoFile
      *
      * @return string
      */
-    public function getFormat()
+    public function getFormat(): string
     {
         return $this->isBinary() ? static::FORMAT_DER : static::FORMAT_PEM;
     }
@@ -101,7 +103,7 @@ class PublicKeyFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getSubject()
+    public function getSubject(): string
     {
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
@@ -119,7 +121,7 @@ class PublicKeyFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getIssuer()
+    public function getIssuer(): string
     {
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
@@ -137,7 +139,7 @@ class PublicKeyFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getNotBefore()
+    public function getNotBefore(): \DateTime
     {
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
@@ -155,7 +157,7 @@ class PublicKeyFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getNotAfter()
+    public function getNotAfter(): \DateTime
     {
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
@@ -176,7 +178,7 @@ class PublicKeyFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function convertFormat($format)
+    public function convertFormat(string $format): PublicKeyFile
     {
         $format = strtolower($format);
 
@@ -212,7 +214,7 @@ class PublicKeyFile extends CryptoFile
      *
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
-    public function move($directory, $name = null)
+    public function move($directory, $name = null): PublicKeyFile
     {
         $file = parent::move($directory, $name);
 

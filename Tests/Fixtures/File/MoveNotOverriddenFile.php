@@ -18,6 +18,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Tests\Fixtures\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\File\CryptoFile;
@@ -27,7 +29,7 @@ class MoveNotOverriddenFile extends CryptoFile
     /**
      * @return bool
      */
-    protected function validate()
+    protected function validate(): bool
     {
         return true;
     }
