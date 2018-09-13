@@ -18,6 +18,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Tests\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
@@ -52,11 +54,13 @@ class PublicKeyFileTest extends TestCase
      *
      * @dataProvider providerPublicKeys
      */
-    public function testNewInstance($path)
+    public function testNewInstance(string $path)
     {
         copy($path, $this->file);
 
-        new PublicKeyFile($this->file);
+        $publicKeyFile = new PublicKeyFile($this->file);
+
+        $this->assertInstanceOf(PublicKeyFile::class, $publicKeyFile);
     }
 
     /**
@@ -66,7 +70,7 @@ class PublicKeyFileTest extends TestCase
      *
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
-    public function testNewInstanceNotPublicKey($path)
+    public function testNewInstanceNotPublicKey(string $path)
     {
         copy($path, $this->file);
 
@@ -78,7 +82,7 @@ class PublicKeyFileTest extends TestCase
      *
      * @dataProvider providerPublicKeys
      */
-    public function testSanitize($path)
+    public function testSanitize(string $path)
     {
         copy($path, $this->file);
 
@@ -86,7 +90,7 @@ class PublicKeyFileTest extends TestCase
 
         $publicKeyFile = $publicKeyFile->sanitize();
 
-        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile', $publicKeyFile);
+        $this->assertInstanceOf(PublicKeyFile::class, $publicKeyFile);
     }
 
     /**
@@ -109,7 +113,7 @@ class PublicKeyFileTest extends TestCase
      *
      * @dataProvider providerPublicKeysAndFormats
      */
-    public function testGetFormat($path, $format)
+    public function testGetFormat(string $path, string $format)
     {
         copy($path, $this->file);
 
@@ -123,7 +127,7 @@ class PublicKeyFileTest extends TestCase
      *
      * @dataProvider providerPublicKeys
      */
-    public function testGetSubject($path)
+    public function testGetSubject(string $path)
     {
         copy($path, $this->file);
 
@@ -156,7 +160,7 @@ class PublicKeyFileTest extends TestCase
      *
      * @dataProvider providerPublicKeys
      */
-    public function testGetIssuer($path)
+    public function testGetIssuer(string $path)
     {
         copy($path, $this->file);
 
@@ -189,7 +193,7 @@ class PublicKeyFileTest extends TestCase
      *
      * @dataProvider providerPublicKeys
      */
-    public function testGetNotBefore($path)
+    public function testGetNotBefore(string $path)
     {
         copy($path, $this->file);
 
@@ -197,7 +201,7 @@ class PublicKeyFileTest extends TestCase
 
         $notBefore = $publicKeyFile->getNotBefore();
 
-        $this->assertInstanceOf('DateTime', $notBefore);
+        $this->assertInstanceOf(\DateTime::class, $notBefore);
         $this->assertSame(static::TEST_NOT_BEFORE, $notBefore->format('Y-m-d H:i:s'));
     }
 
@@ -220,7 +224,7 @@ class PublicKeyFileTest extends TestCase
      *
      * @dataProvider providerPublicKeys
      */
-    public function testGetNotAfter($path)
+    public function testGetNotAfter(string $path)
     {
         copy($path, $this->file);
 
@@ -228,7 +232,7 @@ class PublicKeyFileTest extends TestCase
 
         $notAfter = $publicKeyFile->getNotAfter();
 
-        $this->assertInstanceOf('DateTime', $notAfter);
+        $this->assertInstanceOf(\DateTime::class, $notAfter);
         $this->assertSame(static::TEST_NOT_AFTER, $notAfter->format('Y-m-d H:i:s'));
     }
 
@@ -252,7 +256,7 @@ class PublicKeyFileTest extends TestCase
      *
      * @dataProvider providerConvertFormat
      */
-    public function testConvertFormat($path, $format)
+    public function testConvertFormat(string $path, string $format)
     {
         copy($path, $this->file);
 
@@ -260,7 +264,7 @@ class PublicKeyFileTest extends TestCase
 
         $publicKeyFile = $publicKeyFile->convertFormat($format);
 
-        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile', $publicKeyFile);
+        $this->assertInstanceOf(PublicKeyFile::class, $publicKeyFile);
         $this->assertSame($format, $publicKeyFile->getFormat());
     }
 
@@ -298,13 +302,13 @@ class PublicKeyFileTest extends TestCase
 
         $publicKeyFile = $publicKeyFile->move($publicKeyFile->getPath(), $publicKeyFile->getFilename());
 
-        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile', $publicKeyFile);
+        $this->assertInstanceOf(PublicKeyFile::class, $publicKeyFile);
     }
 
     /**
      * return array[]
      */
-    public function providerPublicKeys()
+    public function providerPublicKeys(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/x509-pem.crt'],
@@ -315,7 +319,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerNotPublicKeys()
+    public function providerNotPublicKeys(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12'],
@@ -335,7 +339,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerPublicKeysAndFormats()
+    public function providerPublicKeysAndFormats(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', PublicKeyFile::FORMAT_PEM],
@@ -346,7 +350,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * @return array[]
      */
-    public function providerConvertFormat()
+    public function providerConvertFormat(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', PublicKeyFile::FORMAT_PEM],

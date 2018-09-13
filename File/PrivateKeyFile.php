@@ -18,6 +18,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException;
@@ -43,7 +45,7 @@ class PrivateKeyFile extends CryptoFile
      *
      * @return bool
      */
-    protected function validate()
+    protected function validate(): bool
     {
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
@@ -80,7 +82,7 @@ class PrivateKeyFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function sanitize($passPhrase = null)
+    public function sanitize(string $passPhrase = null): PrivateKeyFile
     {
         if ('' === $passPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
@@ -88,7 +90,7 @@ class PrivateKeyFile extends CryptoFile
 
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
-        $pass = escapeshellarg($passPhrase);
+        $pass = escapeshellarg((string) $passPhrase);
 
         if (null !== $passPhrase) {
             $rsaPassOut = "-passout pass:$pass -des3";
@@ -111,7 +113,7 @@ class PrivateKeyFile extends CryptoFile
      *
      * @return string
      */
-    public function getFormat()
+    public function getFormat(): string
     {
         return $this->isBinary() ? static::FORMAT_DER : static::FORMAT_PEM;
     }
@@ -136,7 +138,7 @@ class PrivateKeyFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function convertFormat($format, $passPhrase = null)
+    public function convertFormat(string $format, string $passPhrase = null): PrivateKeyFile
     {
         $format = strtolower($format);
 
@@ -155,7 +157,7 @@ class PrivateKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
         $outForm = escapeshellarg($format);
-        $pass = escapeshellarg($passPhrase);
+        $pass = escapeshellarg((string) $passPhrase);
 
         if (null !== $passPhrase) {
             $rsaPassOut = "-passout pass:$pass -des3";
@@ -178,7 +180,7 @@ class PrivateKeyFile extends CryptoFile
      *
      * @return bool
      */
-    public function hasPassPhrase()
+    public function hasPassPhrase(): bool
     {
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
@@ -202,7 +204,7 @@ class PrivateKeyFile extends CryptoFile
      *
      * @return bool
      */
-    public function verifyPassPhrase($passPhrase)
+    public function verifyPassPhrase(string $passPhrase): bool
     {
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
@@ -232,7 +234,7 @@ class PrivateKeyFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function addPassPhrase($passPhrase)
+    public function addPassPhrase(string $passPhrase): PrivateKeyFile
     {
         if ('' === $passPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
@@ -261,7 +263,7 @@ class PrivateKeyFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function removePassPhrase($passPhrase)
+    public function removePassPhrase(string $passPhrase): PrivateKeyFile
     {
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
@@ -291,7 +293,7 @@ class PrivateKeyFile extends CryptoFile
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function changePassPhrase($passPhrase, $newPassPhrase)
+    public function changePassPhrase(string $passPhrase, string $newPassPhrase): PrivateKeyFile
     {
         if ('' === $newPassPhrase) {
             throw new PrivateKeyPassPhraseEmptyException();
@@ -322,7 +324,7 @@ class PrivateKeyFile extends CryptoFile
      *
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
-    public function move($directory, $name = null)
+    public function move($directory, $name = null): PrivateKeyFile
     {
         $file = parent::move($directory, $name);
 

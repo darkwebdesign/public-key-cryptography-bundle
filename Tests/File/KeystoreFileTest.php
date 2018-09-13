@@ -18,9 +18,12 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Tests\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile;
+use DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
 use PHPUnit\Framework\TestCase;
@@ -56,11 +59,13 @@ class KeystoreFileTest extends TestCase
      *
      * @dataProvider providerKeystores
      */
-    public function testNewInstance($path)
+    public function testNewInstance(string $path)
     {
         copy($path, $this->file);
 
-        new KeystoreFile($this->file);
+        $keystoreFile = new KeystoreFile($this->file);
+
+        $this->assertInstanceOf(KeystoreFile::class, $keystoreFile);
     }
 
     /**
@@ -70,7 +75,7 @@ class KeystoreFileTest extends TestCase
      *
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
-    public function testNewInstanceNotKeystoreFile($path)
+    public function testNewInstanceNotKeystoreFile(string $path)
     {
         copy($path, $this->file);
 
@@ -84,14 +89,14 @@ class KeystoreFileTest extends TestCase
      *
      * @dataProvider providerCreate
      */
-    public function testCreate($publicKeyPath, $privateKeyPath, $privateKeyPassPhrase = null)
+    public function testCreate(string $publicKeyPath, string $privateKeyPath, string $privateKeyPassPhrase = null)
     {
         $publicKeyFile = new PublicKeyFile($publicKeyPath);
         $privateKeyFile = new PrivateKeyFile($privateKeyPath);
 
         $keystoreFile = KeystoreFile::create($this->file, static::TEST_PASSPHRASE, $publicKeyFile, $privateKeyFile, $privateKeyPassPhrase);
 
-        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile', $keystoreFile);
+        $this->assertInstanceOf(KeystoreFile::class, $keystoreFile);
         $this->assertTrue($keystoreFile->verifyPassPhrase(static::TEST_PASSPHRASE));
     }
 
@@ -112,7 +117,7 @@ class KeystoreFileTest extends TestCase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetPem($path, $passPhrase)
+    public function testGetPem(string $path, string $passPhrase)
     {
         copy($path, $this->file);
 
@@ -120,7 +125,7 @@ class KeystoreFileTest extends TestCase
 
         $pemFile = $keystoreFile->getPem($this->file, $passPhrase);
 
-        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile', $pemFile);
+        $this->assertInstanceOf(PemFile::class, $pemFile);
         $this->assertSame(static::TEST_EMPTYPASSPHRASE !== $passPhrase, $pemFile->hasPassPhrase());
         $this->assertTrue($pemFile->verifyPassPhrase($passPhrase));
     }
@@ -143,7 +148,7 @@ class KeystoreFileTest extends TestCase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetPublicKey($path, $passPhrase)
+    public function testGetPublicKey(string $path, string $passPhrase)
     {
         copy($path, $this->file);
 
@@ -151,7 +156,7 @@ class KeystoreFileTest extends TestCase
 
         $publicKeyFile = $keystoreFile->getPublicKey($this->file, $passPhrase);
 
-        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile', $publicKeyFile);
+        $this->assertInstanceOf(PublicKeyFile::class, $publicKeyFile);
     }
 
     /**
@@ -172,7 +177,7 @@ class KeystoreFileTest extends TestCase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetPrivateKey($path, $passPhrase)
+    public function testGetPrivateKey(string $path, string $passPhrase)
     {
         copy($path, $this->file);
 
@@ -180,7 +185,7 @@ class KeystoreFileTest extends TestCase
 
         $privateKeyFile = $keystoreFile->getPrivateKey($this->file, $passPhrase);
 
-        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile', $privateKeyFile);
+        $this->assertInstanceOf(PrivateKeyFile::class, $privateKeyFile);
         $this->assertSame(static::TEST_EMPTYPASSPHRASE !== $passPhrase, $privateKeyFile->hasPassPhrase());
         $this->assertTrue($privateKeyFile->verifyPassPhrase($passPhrase));
     }
@@ -203,7 +208,7 @@ class KeystoreFileTest extends TestCase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetSubject($path, $passPhrase)
+    public function testGetSubject(string $path, string $passPhrase)
     {
         copy($path, $this->file);
 
@@ -235,7 +240,7 @@ class KeystoreFileTest extends TestCase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetIssuer($path, $passPhrase)
+    public function testGetIssuer(string $path, string $passPhrase)
     {
         copy($path, $this->file);
 
@@ -267,7 +272,7 @@ class KeystoreFileTest extends TestCase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetNotBefore($path, $passPhrase)
+    public function testGetNotBefore(string $path, string $passPhrase)
     {
         copy($path, $this->file);
 
@@ -275,7 +280,7 @@ class KeystoreFileTest extends TestCase
 
         $notBefore = $keystoreFile->getNotBefore($passPhrase);
 
-        $this->assertInstanceOf('DateTime', $notBefore);
+        $this->assertInstanceOf(\DateTime::class, $notBefore);
         $this->assertSame(static::TEST_NOT_BEFORE, $notBefore->format('Y-m-d H:i:s'));
     }
 
@@ -297,7 +302,7 @@ class KeystoreFileTest extends TestCase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetNotAfter($path, $passPhrase)
+    public function testGetNotAfter(string $path, string $passPhrase)
     {
         copy($path, $this->file);
 
@@ -305,7 +310,7 @@ class KeystoreFileTest extends TestCase
 
         $notAfter = $keystoreFile->getNotAfter($passPhrase);
 
-        $this->assertInstanceOf('DateTime', $notAfter);
+        $this->assertInstanceOf(\DateTime::class, $notAfter);
         $this->assertSame(static::TEST_NOT_AFTER, $notAfter->format('Y-m-d H:i:s'));
     }
 
@@ -327,7 +332,7 @@ class KeystoreFileTest extends TestCase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testVerifyPassPhrase($path, $passPhrase)
+    public function testVerifyPassPhrase(string $path, string $passPhrase)
     {
         copy($path, $this->file);
 
@@ -343,7 +348,7 @@ class KeystoreFileTest extends TestCase
      *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testChangePassPhrase($path, $passPhrase)
+    public function testChangePassPhrase(string $path, string $passPhrase)
     {
         copy($path, $this->file);
 
@@ -374,13 +379,13 @@ class KeystoreFileTest extends TestCase
 
         $keystoreFile = $keystoreFile->move($keystoreFile->getPath(), $keystoreFile->getFilename());
 
-        $this->assertInstanceOf('DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile', $keystoreFile);
+        $this->assertInstanceOf(KeystoreFile::class, $keystoreFile);
     }
 
     /**
      * return array[]
      */
-    public function providerKeystores()
+    public function providerKeystores(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12'],
@@ -391,7 +396,7 @@ class KeystoreFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerKeystoresAndPassPhrases()
+    public function providerKeystoresAndPassPhrases(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', static::TEST_PASSPHRASE],
@@ -402,7 +407,7 @@ class KeystoreFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerNotKeystores()
+    public function providerNotKeystores(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/pem-pass.pem'],
@@ -422,7 +427,7 @@ class KeystoreFileTest extends TestCase
     /**
      * return array[]
      */
-    public function providerCreate()
+    public function providerCreate(): array
     {
         return [
             [__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', __DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', static::TEST_PASSPHRASE],

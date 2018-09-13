@@ -18,6 +18,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
 use Symfony\Component\Process\Process;
@@ -34,7 +36,7 @@ class KeystoreFile extends CryptoFile
      *
      * @return bool
      */
-    protected function validate()
+    protected function validate(): bool
     {
         $in = escapeshellarg($this->getPathname());
 
@@ -67,14 +69,14 @@ class KeystoreFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public static function create($path, $passPhrase, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, $privateKeyPassPhrase = null)
+    public static function create(string $path, string $passPhrase, PublicKeyFile $publicKeyFile, PrivateKeyFile $privateKeyFile, string $privateKeyPassPhrase = null): KeystoreFile
     {
         $pass = escapeshellarg($passPhrase);
         $publicKeyIn = escapeshellarg($publicKeyFile->getPathname());
         $publicKeyInForm = escapeshellarg($publicKeyFile->getFormat());
         $privateKeyIn = escapeshellarg($privateKeyFile->getPathname());
         $privateKeyInForm = escapeshellarg($privateKeyFile->getFormat());
-        $privateKeyPass = escapeshellarg($privateKeyPassPhrase);
+        $privateKeyPass = escapeshellarg((string) $privateKeyPassPhrase);
 
         $process1 = new Process("openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass -passout pass:pipe -des3");
         $process1->mustRun();
@@ -102,7 +104,7 @@ class KeystoreFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPem($path, $passPhrase)
+    public function getPem(string $path, string $passPhrase): PemFile
     {
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
@@ -144,7 +146,7 @@ class KeystoreFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPublicKey($path, $passPhrase)
+    public function getPublicKey(string $path, string $passPhrase): PublicKeyFile
     {
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
@@ -175,7 +177,7 @@ class KeystoreFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getPrivateKey($path, $passPhrase)
+    public function getPrivateKey(string $path, string $passPhrase): PrivateKeyFile
     {
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
@@ -209,7 +211,7 @@ class KeystoreFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getSubject($passPhrase)
+    public function getSubject(string $passPhrase): string
     {
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
@@ -233,7 +235,7 @@ class KeystoreFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getIssuer($passPhrase)
+    public function getIssuer(string $passPhrase): string
     {
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
@@ -257,7 +259,7 @@ class KeystoreFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getNotBefore($passPhrase)
+    public function getNotBefore(string $passPhrase): \DateTime
     {
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
@@ -281,7 +283,7 @@ class KeystoreFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function getNotAfter($passPhrase)
+    public function getNotAfter(string $passPhrase): \DateTime
     {
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
@@ -303,7 +305,7 @@ class KeystoreFile extends CryptoFile
      *
      * @return bool
      */
-    public function verifyPassPhrase($passPhrase)
+    public function verifyPassPhrase(string $passPhrase): bool
     {
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
@@ -324,7 +326,7 @@ class KeystoreFile extends CryptoFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function changePassPhrase($passPhrase, $newPassPhrase)
+    public function changePassPhrase(string $passPhrase, string $newPassPhrase): KeystoreFile
     {
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
@@ -365,7 +367,7 @@ class KeystoreFile extends CryptoFile
      *
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
-    public function move($directory, $name = null)
+    public function move($directory, $name = null): KeystoreFile
     {
         $file = parent::move($directory, $name);
 

@@ -18,6 +18,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException;
@@ -39,7 +41,7 @@ abstract class CryptoFile extends File
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException
      */
-    public function __construct($path)
+    public function __construct(string $path)
     {
         parent::__construct($path);
 
@@ -53,14 +55,14 @@ abstract class CryptoFile extends File
      *
      * @return bool
      */
-    abstract protected function validate();
+    abstract protected function validate(): bool;
 
     /**
      * Checks if the file is binary.
      *
      * @return bool
      */
-    protected function isBinary()
+    protected function isBinary(): bool
     {
         $command = sprintf(
             'file --brief --mime-encoding %1$s | grep binary',

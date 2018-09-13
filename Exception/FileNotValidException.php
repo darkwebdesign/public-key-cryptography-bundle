@@ -18,6 +18,8 @@
  * SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Exception;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
