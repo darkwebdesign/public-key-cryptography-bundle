@@ -123,7 +123,7 @@ class KeystoreFile extends CryptoFile
         $process2->setInput($process1->getOutput());
         $process2->mustRun();
 
-        $process3 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process3 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process3->mustRun();
 
         $process4 = new Process("openssl x509");
@@ -151,7 +151,7 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process1->mustRun();
 
         $process2 = new Process("openssl x509");
@@ -216,7 +216,7 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process1->mustRun();
 
         $process2 = new Process('openssl x509 -noout -subject');
@@ -240,7 +240,7 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process1->mustRun();
 
         $process2 = new Process('openssl x509 -noout -issuer');
@@ -264,7 +264,7 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process1->mustRun();
 
         $process2 = new Process('openssl x509 -noout -startdate');
@@ -288,7 +288,7 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process1->mustRun();
 
         $process2 = new Process('openssl x509 -noout -enddate');
@@ -339,7 +339,7 @@ class KeystoreFile extends CryptoFile
         $process2->setInput($process1->getOutput());
         $process2->mustRun();
 
-        $process3 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process3 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process3->mustRun();
 
         $process4 = new Process("openssl x509");
