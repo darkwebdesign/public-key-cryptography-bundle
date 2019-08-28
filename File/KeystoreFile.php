@@ -114,17 +114,17 @@ class KeystoreFile extends CryptoFile
             $rsaPassOut = '';
         }
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
+        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe");
         $process1->mustRun();
 
-        $process2 = new Process("openssl x509");
+        $process2 = new Process("openssl rsa -passin pass:pipe $rsaPassOut");
         $process2->setInput($process1->getOutput());
         $process2->mustRun();
 
-        $process3 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe");
+        $process3 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys");
         $process3->mustRun();
 
-        $process4 = new Process("openssl rsa -passin pass:pipe $rsaPassOut");
+        $process4 = new Process("openssl x509");
         $process4->setInput($process3->getOutput());
         $process4->mustRun();
 
