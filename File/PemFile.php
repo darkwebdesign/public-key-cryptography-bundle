@@ -136,10 +136,10 @@ class PemFile extends CryptoFile
             $rsaPassOut = '';
         }
 
-        $process1 = new Process("openssl x509 -in $publicKeyIn -inform $publicKeyInForm");
+        $process1 = new Process("openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass $rsaPassOut");
         $process1->mustRun();
 
-        $process2 = new Process("openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass $rsaPassOut");
+        $process2 = new Process("openssl x509 -in $publicKeyIn -inform $publicKeyInForm");
         $process2->mustRun();
 
         @file_put_contents($path, $process1->getOutput() . $process2->getOutput());
