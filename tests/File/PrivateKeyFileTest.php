@@ -22,8 +22,12 @@ declare(strict_types=1);
 
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Tests\File;
 
+use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException;
+use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException;
+use DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class PrivateKeyFileTest extends TestCase
 {
@@ -59,11 +63,11 @@ class PrivateKeyFileTest extends TestCase
 
     /**
      * @dataProvider providerNotPrivateKeys
-     *
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
     public function testNewInstanceNotPrivateKey(string $path): void
     {
+        $this->expectException(FileNotValidException::class);
+
         copy($path, $this->file);
 
         new PrivateKeyFile($this->file);
@@ -83,11 +87,10 @@ class PrivateKeyFileTest extends TestCase
         $this->assertInstanceOf(PrivateKeyFile::class, $privateKeyFile);
     }
 
-    /**
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
-     */
     public function testSanitizeEmptyPassPhrase(): void
     {
+        $this->expectException(PrivateKeyPassPhraseEmptyException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
@@ -95,11 +98,10 @@ class PrivateKeyFileTest extends TestCase
         $privateKeyFile->sanitize(static::TEST_EMPTYPASSPHRASE);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testSanitizeProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
@@ -135,11 +137,10 @@ class PrivateKeyFileTest extends TestCase
         $this->assertSame(null !== $passPhrase, $privateKeyFile->hasPassPhrase());
     }
 
-    /**
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException
-     */
     public function testConvertFormatInvalidFormat(): void
     {
+        $this->expectException(FormatNotValidException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
@@ -147,11 +148,10 @@ class PrivateKeyFileTest extends TestCase
         $privateKeyFile->convertFormat('invalid-format');
     }
 
-    /**
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
-     */
     public function testConvertFormatEmptyPassPhrase(): void
     {
+        $this->expectException(PrivateKeyPassPhraseEmptyException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
@@ -159,11 +159,10 @@ class PrivateKeyFileTest extends TestCase
         $privateKeyFile->convertFormat(PrivateKeyFile::FORMAT_DER, static::TEST_EMPTYPASSPHRASE);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testConvertFormatProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
@@ -211,11 +210,10 @@ class PrivateKeyFileTest extends TestCase
         $this->assertTrue($privateKeyFile->verifyPassPhrase(static::TEST_PASSPHRASE));
     }
 
-    /**
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
-     */
     public function testAddPassPhraseEmptyPassPhrase(): void
     {
+        $this->expectException(PrivateKeyPassPhraseEmptyException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key', $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
@@ -223,11 +221,10 @@ class PrivateKeyFileTest extends TestCase
         $privateKeyFile->addPassPhrase(static::TEST_EMPTYPASSPHRASE);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testAddPassPhraseProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
@@ -251,11 +248,10 @@ class PrivateKeyFileTest extends TestCase
         $this->assertFalse($privateKeyFile->hasPassPhrase());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testRemovePassPhraseProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
@@ -279,11 +275,10 @@ class PrivateKeyFileTest extends TestCase
         $this->assertTrue($verified);
     }
 
-    /**
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
-     */
     public function testChangePassPhraseEmptyPassPhrase(): void
     {
+        $this->expectException(PrivateKeyPassPhraseEmptyException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
@@ -291,11 +286,10 @@ class PrivateKeyFileTest extends TestCase
         $privateKeyFile->changePassPhrase(static::TEST_PASSPHRASE, static::TEST_EMPTYPASSPHRASE);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testChangePassPhraseProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
         $privateKeyFile = new PrivateKeyFile($this->file);
