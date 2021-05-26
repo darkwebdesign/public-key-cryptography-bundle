@@ -4,8 +4,8 @@
 [![Total Downloads](https://poser.pugx.org/darkwebdesign/public-key-cryptography-bundle/downloads?format=flat)](https://packagist.org/packages/darkwebdesign/public-key-cryptography-bundle)
 [![License](https://poser.pugx.org/darkwebdesign/public-key-cryptography-bundle/license?format=flat)](https://packagist.org/packages/darkwebdesign/public-key-cryptography-bundle)
 
-[![Build Status](https://travis-ci.org/darkwebdesign/public-key-cryptography-bundle.svg?branch=1.1)](https://travis-ci.org/darkwebdesign/public-key-cryptography-bundle?branch=1.1)
-[![Coverage Status](https://codecov.io/gh/darkwebdesign/public-key-cryptography-bundle/branch/1.1/graph/badge.svg)](https://codecov.io/gh/darkwebdesign/public-key-cryptography-bundle)
+[![Build Status](https://travis-ci.com/darkwebdesign/public-key-cryptography-bundle.svg?branch=1.3)](https://travis-ci.com/darkwebdesign/public-key-cryptography-bundle)
+[![Coverage Status](https://codecov.io/gh/darkwebdesign/public-key-cryptography-bundle/branch/1.3/graph/badge.svg)](https://codecov.io/gh/darkwebdesign/public-key-cryptography-bundle)
 [![PHP Version](https://img.shields.io/badge/php-7.2%2B-777BB3.svg)](https://php.net/)
 [![Symfony Version](https://img.shields.io/badge/symfony-5.x-93C74B.svg)](https://symfony.com/)
 
