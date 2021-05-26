@@ -16,6 +16,9 @@
     <filter>
         <whitelist>
             <directory>src</directory>
+            <exclude>
+                <file>src/PublicKeyCryptographyBundle.php</file>
+            </exclude>
         </whitelist>
     </filter>
 
