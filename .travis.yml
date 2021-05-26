@@ -1,3 +1,7 @@
+env:
+    global:
+        - 'CC_TEST_REPORTER_ID=b62e8252c873bdad0fc71b79f9498a307a8f7a344b58aaff85c94a78eaa83abb'
+
 language: 'php'
 
 php:
@@ -9,8 +13,14 @@ php:
 install:
     - 'composer install'
 
+before_script:
+    - 'curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter'
+    - 'chmod +x ./cc-test-reporter'
+    - './cc-test-reporter before-build'
+
 script:
     - 'XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-text --coverage-clover build/logs/clover.xml'
 
 after_success:
     - 'bash <(curl -s https://codecov.io/bash) -f build/logs/clover.xml'
+    - './cc-test-reporter after-build'
