@@ -31,10 +31,7 @@ namespace DarkWebDesign\PublicKeyCryptographyBundle\Exception;
  */
 class FormatNotValidException extends \InvalidArgumentException
 {
-    /**
-     * @param string $format
-     */
-    public function __construct($format)
+    public function __construct(string $format)
     {
         parent::__construct(sprintf('The format "%s" is not valid.', $format));
     }

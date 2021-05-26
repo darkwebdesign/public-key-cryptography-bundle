@@ -30,12 +30,12 @@ class CryptoFileTest extends TestCase
     /** @var string */
     private $file;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->file = tempnam(sys_get_temp_dir(), 'php');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (file_exists($this->file)) {
             unlink($this->file);
@@ -45,7 +45,7 @@ class CryptoFileTest extends TestCase
     /**
      * @expectedException \BadFunctionCallException
      */
-    public function testMoveNotOverridden()
+    public function testMoveNotOverridden(): void
     {
         $file = new MoveNotOverriddenFile($this->file);
 

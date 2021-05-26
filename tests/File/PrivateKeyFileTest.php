@@ -33,12 +33,12 @@ class PrivateKeyFileTest extends TestCase
     /** @var string */
     private $file;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->file = tempnam(sys_get_temp_dir(), 'php');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (file_exists($this->file)) {
             unlink($this->file);
@@ -46,11 +46,9 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerPrivateKeys
      */
-    public function testNewInstance(string $path)
+    public function testNewInstance(string $path): void
     {
         copy($path, $this->file);
 
@@ -60,13 +58,11 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerNotPrivateKeys
      *
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
-    public function testNewInstanceNotPrivateKey(string $path)
+    public function testNewInstanceNotPrivateKey(string $path): void
     {
         copy($path, $this->file);
 
@@ -74,12 +70,9 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string|null $passPhrase
-     *
      * @dataProvider providerPrivateKeysAndPassPhrases
      */
-    public function testSanitize(string $path, string $passPhrase = null)
+    public function testSanitize(string $path, string $passPhrase = null): void
     {
         copy($path, $this->file);
 
@@ -93,7 +86,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      */
-    public function testSanitizeEmptyPassPhrase()
+    public function testSanitizeEmptyPassPhrase(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
@@ -105,7 +98,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testSanitizeProcessFailed()
+    public function testSanitizeProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
@@ -115,12 +108,9 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string $format
-     *
      * @dataProvider providerPrivateKeysAndFormats
      */
-    public function testGetFormat(string $path, string $format)
+    public function testGetFormat(string $path, string $format): void
     {
         copy($path, $this->file);
 
@@ -130,13 +120,9 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string $format
-     * @param string|null $passPhrase
-     *
      * @dataProvider providerConvertFormat
      */
-    public function testConvertFormat(string $path, string $format, string $passPhrase = null)
+    public function testConvertFormat(string $path, string $format, string $passPhrase = null): void
     {
         copy($path, $this->file);
 
@@ -152,7 +138,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException
      */
-    public function testConvertFormatInvalidFormat()
+    public function testConvertFormatInvalidFormat(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
@@ -164,7 +150,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      */
-    public function testConvertFormatEmptyPassPhrase()
+    public function testConvertFormatEmptyPassPhrase(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
@@ -176,7 +162,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testConvertFormatProcessFailed()
+    public function testConvertFormatProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
@@ -186,12 +172,9 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param bool $hasPassphrase
-     *
      * @dataProvider providerHasPassPhrase
      */
-    public function testHasPassPhrase(string $path, bool $hasPassphrase)
+    public function testHasPassPhrase(string $path, bool $hasPassphrase): void
     {
         copy($path, $this->file);
 
@@ -201,11 +184,9 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerPrivateKeysHavingPassPhrases
      */
-    public function testVerifyPassPhrase(string $path)
+    public function testVerifyPassPhrase(string $path): void
     {
         copy($path, $this->file);
 
@@ -216,11 +197,9 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerPrivateKeysNotHavingPassPhrases
      */
-    public function testAddPassPhrase(string $path)
+    public function testAddPassPhrase(string $path): void
     {
         copy($path, $this->file);
 
@@ -235,7 +214,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      */
-    public function testAddPassPhraseEmptyPassPhrase()
+    public function testAddPassPhraseEmptyPassPhrase(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-nopass-pem.key', $this->file);
 
@@ -247,7 +226,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testAddPassPhraseProcessFailed()
+    public function testAddPassPhraseProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
@@ -259,11 +238,9 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerPrivateKeysHavingPassPhrases
      */
-    public function testRemovePassPhrase(string $path)
+    public function testRemovePassPhrase(string $path): void
     {
         copy($path, $this->file);
 
@@ -277,7 +254,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testRemovePassPhraseProcessFailed()
+    public function testRemovePassPhraseProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
@@ -287,11 +264,9 @@ class PrivateKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerPrivateKeysHavingPassPhrases
      */
-    public function testChangePassPhrase(string $path)
+    public function testChangePassPhrase(string $path): void
     {
         copy($path, $this->file);
 
@@ -307,7 +282,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      */
-    public function testChangePassPhraseEmptyPassPhrase()
+    public function testChangePassPhraseEmptyPassPhrase(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
@@ -319,7 +294,7 @@ class PrivateKeyFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testChangePassPhraseProcessFailed()
+    public function testChangePassPhraseProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
@@ -328,7 +303,7 @@ class PrivateKeyFileTest extends TestCase
         $privateKeyFile->changePassPhrase('invalid-passphrase', 'new-passphrase');
     }
 
-    public function testMove()
+    public function testMove(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key', $this->file);
 
@@ -339,9 +314,6 @@ class PrivateKeyFileTest extends TestCase
         $this->assertInstanceOf(PrivateKeyFile::class, $privateKeyFile);
     }
 
-    /**
-     * return array[]
-     */
     public function providerPrivateKeys(): array
     {
         return [
@@ -355,9 +327,6 @@ class PrivateKeyFileTest extends TestCase
         ];
     }
 
-    /**
-     * return array[]
-     */
     public function providerPrivateKeysAndPassPhrases(): array
     {
         return [
@@ -371,9 +340,6 @@ class PrivateKeyFileTest extends TestCase
         ];
     }
 
-    /**
-     * return array[]
-     */
     public function providerPrivateKeysAndFormats(): array
     {
         return [
@@ -387,9 +353,6 @@ class PrivateKeyFileTest extends TestCase
         ];
     }
 
-    /**
-     * @return array[]
-     */
     public function providerPrivateKeysHavingPassPhrases(): array
     {
         return [
@@ -399,9 +362,6 @@ class PrivateKeyFileTest extends TestCase
         ];
     }
 
-    /**
-     * @return array[]
-     */
     public function providerPrivateKeysNotHavingPassPhrases(): array
     {
         return [
@@ -412,9 +372,6 @@ class PrivateKeyFileTest extends TestCase
         ];
     }
 
-    /**
-     * return array[]
-     */
     public function providerNotPrivateKeys(): array
     {
         return [
@@ -427,9 +384,6 @@ class PrivateKeyFileTest extends TestCase
         ];
     }
 
-    /**
-     * return array[]
-     */
     public function providerConvertFormat(): array
     {
         return [
@@ -450,9 +404,6 @@ class PrivateKeyFileTest extends TestCase
         ];
     }
 
-    /**
-     * return array[]
-     */
     public function providerHasPassPhrase(): array
     {
         return [

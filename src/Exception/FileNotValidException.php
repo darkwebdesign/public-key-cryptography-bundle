@@ -33,10 +33,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
  */
 class FileNotValidException extends FileException
 {
-    /**
-     * @param string $path
-     */
-    public function __construct($path)
+    public function __construct(string $path)
     {
         parent::__construct(sprintf('The file "%s" is not valid.', $path));
     }

@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
 /**
@@ -34,8 +35,6 @@ class PemFile extends CryptoFile
 {
     /**
      * Validates that the file is actually a PEM file containing a public/private key pair.
-     *
-     * @return bool
      */
     protected function validate(): bool
     {
@@ -65,10 +64,6 @@ class PemFile extends CryptoFile
      *
      * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
      * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown.
-     *
-     * @param string|null $passPhrase
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile
      *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -108,13 +103,6 @@ class PemFile extends CryptoFile
      * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown. Pass NULL as pass phrase if you want no
      * pass phrase on the private key instead.
      *
-     * @param string $path
-     * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile $publicKeyFile
-     * @param \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile $privateKeyFile
-     * @param string|null $privateKeyPassPhrase
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile
-     *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
@@ -151,12 +139,6 @@ class PemFile extends CryptoFile
     /**
      * Gets a keystore containing the public/private key pair.
      *
-     * @param string $path
-     * @param string $keystorePassPhrase
-     * @param string|null $privateKeyPassPhrase
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile
-     *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getKeystore(string $path, string $keystorePassPhrase, string $privateKeyPassPhrase = null): KeystoreFile
@@ -176,10 +158,6 @@ class PemFile extends CryptoFile
 
     /**
      * Gets the public key.
-     *
-     * @param string $path
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
@@ -202,11 +180,6 @@ class PemFile extends CryptoFile
      * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
      * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown. Pass NULL as pass phrase if you want no
      * pass phrase on the private key instead.
-     *
-     * @param string $path
-     * @param string|null $passPhrase
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
      *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -238,8 +211,6 @@ class PemFile extends CryptoFile
     /**
      * Gets the public key "subject" attribute.
      *
-     * @return string
-     *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getSubject(): string
@@ -254,8 +225,6 @@ class PemFile extends CryptoFile
 
     /**
      * Gets the public key "issuer" attribute.
-     *
-     * @return string
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
@@ -272,8 +241,6 @@ class PemFile extends CryptoFile
     /**
      * Gets the public key "notBefore" attribute.
      *
-     * @return \DateTime
-     *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getNotBefore(): \DateTime
@@ -289,8 +256,6 @@ class PemFile extends CryptoFile
     /**
      * Gets the public key "notAfter" attribute.
      *
-     * @return \DateTime
-     *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getNotAfter(): \DateTime
@@ -305,8 +270,6 @@ class PemFile extends CryptoFile
 
     /**
      * Checks if the private key contains a pass phrase.
-     *
-     * @return bool
      */
     public function hasPassPhrase(): bool
     {
@@ -326,10 +289,6 @@ class PemFile extends CryptoFile
      *
      * This methods verifies if the specified pass phrase can be used to read the private key. This means that verifying
      * a private key without a pass phrase will always return true for all specified pass phrases.
-     *
-     * @param string $passPhrase
-     *
-     * @return bool
      */
     public function verifyPassPhrase(string $passPhrase): bool
     {
@@ -347,10 +306,6 @@ class PemFile extends CryptoFile
      *
      * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
      * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown.
-     *
-     * @param string $passPhrase
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile
      *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -380,10 +335,6 @@ class PemFile extends CryptoFile
     /**
      * Removes the pass phrase from the private key.
      *
-     * @param string $passPhrase
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile
-     *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function removePassPhrase(string $passPhrase): PemFile
@@ -409,11 +360,6 @@ class PemFile extends CryptoFile
      *
      * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
      * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown.
-     *
-     * @param string $passPhrase
-     * @param string $newPassPhrase
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile
      *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -444,14 +390,11 @@ class PemFile extends CryptoFile
     /**
      * Moves the file to a new location.
      *
-     * @param string $directory
-     * @param string|null $name
-     *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile
      *
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
-    public function move($directory, $name = null): PemFile
+    public function move(string $directory, string $name = null): File
     {
         $file = parent::move($directory, $name);
 
