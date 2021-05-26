@@ -42,12 +42,12 @@ class KeystoreFileTest extends TestCase
     /** @var string */
     private $file;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->file = tempnam(sys_get_temp_dir(), 'php');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (file_exists($this->file)) {
             unlink($this->file);
@@ -55,11 +55,9 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerKeystores
      */
-    public function testNewInstance(string $path)
+    public function testNewInstance(string $path): void
     {
         copy($path, $this->file);
 
@@ -69,13 +67,11 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerNotKeystores
      *
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
-    public function testNewInstanceNotKeystoreFile(string $path)
+    public function testNewInstanceNotKeystoreFile(string $path): void
     {
         copy($path, $this->file);
 
@@ -83,13 +79,9 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $publicKeyPath
-     * @param string $privateKeyPath
-     * @param string|null $privateKeyPassPhrase
-     *
      * @dataProvider providerCreate
      */
-    public function testCreate(string $publicKeyPath, string $privateKeyPath, string $privateKeyPassPhrase = null)
+    public function testCreate(string $publicKeyPath, string $privateKeyPath, string $privateKeyPassPhrase = null): void
     {
         $publicKeyFile = new PublicKeyFile($publicKeyPath);
         $privateKeyFile = new PrivateKeyFile($privateKeyPath);
@@ -103,7 +95,7 @@ class KeystoreFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testCreateProcessFailed()
+    public function testCreateProcessFailed(): void
     {
         $publicKeyFile = new PublicKeyFile(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt');
         $privateKeyFile = new PrivateKeyFile(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key');
@@ -112,12 +104,9 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string $passPhrase
-     *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetPem(string $path, string $passPhrase)
+    public function testGetPem(string $path, string $passPhrase): void
     {
         copy($path, $this->file);
 
@@ -133,7 +122,7 @@ class KeystoreFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testGetPemProcessFailed()
+    public function testGetPemProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
@@ -143,12 +132,9 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string $passPhrase
-     *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetPublicKey(string $path, string $passPhrase)
+    public function testGetPublicKey(string $path, string $passPhrase): void
     {
         copy($path, $this->file);
 
@@ -162,7 +148,7 @@ class KeystoreFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testGetPublicKeyProcessFailed()
+    public function testGetPublicKeyProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
@@ -172,12 +158,9 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string $passPhrase
-     *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetPrivateKey(string $path, string $passPhrase)
+    public function testGetPrivateKey(string $path, string $passPhrase): void
     {
         copy($path, $this->file);
 
@@ -193,7 +176,7 @@ class KeystoreFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testGetPrivateKeyProcessFailed()
+    public function testGetPrivateKeyProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
@@ -203,12 +186,9 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string $passPhrase
-     *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetSubject(string $path, string $passPhrase)
+    public function testGetSubject(string $path, string $passPhrase): void
     {
         copy($path, $this->file);
 
@@ -225,7 +205,7 @@ class KeystoreFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testGetSubjectProcessFailed()
+    public function testGetSubjectProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
@@ -235,12 +215,9 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string $passPhrase
-     *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetIssuer(string $path, string $passPhrase)
+    public function testGetIssuer(string $path, string $passPhrase): void
     {
         copy($path, $this->file);
 
@@ -257,7 +234,7 @@ class KeystoreFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testGetIssuerProcessFailed()
+    public function testGetIssuerProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
@@ -267,12 +244,9 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string $passPhrase
-     *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetNotBefore(string $path, string $passPhrase)
+    public function testGetNotBefore(string $path, string $passPhrase): void
     {
         copy($path, $this->file);
 
@@ -287,7 +261,7 @@ class KeystoreFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testGetNotBeforeProcessFailed()
+    public function testGetNotBeforeProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
@@ -297,12 +271,9 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string $passPhrase
-     *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testGetNotAfter(string $path, string $passPhrase)
+    public function testGetNotAfter(string $path, string $passPhrase): void
     {
         copy($path, $this->file);
 
@@ -317,7 +288,7 @@ class KeystoreFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testGetNotAfterProcessFailed()
+    public function testGetNotAfterProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
@@ -327,12 +298,9 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string $passPhrase
-     *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testVerifyPassPhrase(string $path, string $passPhrase)
+    public function testVerifyPassPhrase(string $path, string $passPhrase): void
     {
         copy($path, $this->file);
 
@@ -343,12 +311,9 @@ class KeystoreFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string $passPhrase
-     *
      * @dataProvider providerKeystoresAndPassPhrases
      */
-    public function testChangePassPhrase(string $path, string $passPhrase)
+    public function testChangePassPhrase(string $path, string $passPhrase): void
     {
         copy($path, $this->file);
 
@@ -362,7 +327,7 @@ class KeystoreFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testChangePassPhraseProcessFailed()
+    public function testChangePassPhraseProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
@@ -371,7 +336,7 @@ class KeystoreFileTest extends TestCase
         $keystoreFile->changePassPhrase('invalid-passphrase', 'new-passphrase');
     }
 
-    public function testMove()
+    public function testMove(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
@@ -382,9 +347,6 @@ class KeystoreFileTest extends TestCase
         $this->assertInstanceOf(KeystoreFile::class, $keystoreFile);
     }
 
-    /**
-     * return array[]
-     */
     public function providerKeystores(): array
     {
         return [
@@ -393,9 +355,6 @@ class KeystoreFileTest extends TestCase
         ];
     }
 
-    /**
-     * return array[]
-     */
     public function providerKeystoresAndPassPhrases(): array
     {
         return [
@@ -404,9 +363,6 @@ class KeystoreFileTest extends TestCase
         ];
     }
 
-    /**
-     * return array[]
-     */
     public function providerNotKeystores(): array
     {
         return [
@@ -424,9 +380,6 @@ class KeystoreFileTest extends TestCase
         ];
     }
 
-    /**
-     * return array[]
-     */
     public function providerCreate(): array
     {
         return [

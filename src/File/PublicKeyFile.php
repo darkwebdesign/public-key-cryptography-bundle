@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
 /**
@@ -37,8 +38,6 @@ class PublicKeyFile extends CryptoFile
 
     /**
      * Validates that the file is actually a public key.
-     *
-     * @return bool
      */
     protected function validate(): bool
     {
@@ -67,8 +66,6 @@ class PublicKeyFile extends CryptoFile
     /**
      * Sanitizes the public key, removing malicious data.
      *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile
-     *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function sanitize(): PublicKeyFile
@@ -88,8 +85,6 @@ class PublicKeyFile extends CryptoFile
 
     /**
      * Gets the public key format (either ascii 'pem' or binary 'der').
-     *
-     * @return string
      */
     public function getFormat(): string
     {
@@ -98,8 +93,6 @@ class PublicKeyFile extends CryptoFile
 
     /**
      * Gets the public key "subject" attribute.
-     *
-     * @return string
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
@@ -117,8 +110,6 @@ class PublicKeyFile extends CryptoFile
     /**
      * Gets the public key "issuer" attribute.
      *
-     * @return string
-     *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getIssuer(): string
@@ -134,8 +125,6 @@ class PublicKeyFile extends CryptoFile
 
     /**
      * Gets the public key "notBefore" attribute.
-     *
-     * @return \DateTime
      *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
@@ -153,8 +142,6 @@ class PublicKeyFile extends CryptoFile
     /**
      * Gets the public key "notAfter" attribute.
      *
-     * @return \DateTime
-     *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function getNotAfter(): \DateTime
@@ -170,10 +157,6 @@ class PublicKeyFile extends CryptoFile
 
     /**
      * Converts the public key format to either ascii 'pem' or binary 'der'.
-     *
-     * @param string $format
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile
      *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -207,14 +190,11 @@ class PublicKeyFile extends CryptoFile
     /**
      * Moves the file to a new location.
      *
-     * @param string $directory
-     * @param string|null $name
-     *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile
      *
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
-    public function move($directory, $name = null): PublicKeyFile
+    public function move(string $directory, string $name = null): File
     {
         $file = parent::move($directory, $name);
 

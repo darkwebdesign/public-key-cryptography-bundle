@@ -37,12 +37,12 @@ class PublicKeyFileTest extends TestCase
     /** @var string */
     private $file;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->file = tempnam(sys_get_temp_dir(), 'php');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (file_exists($this->file)) {
             unlink($this->file);
@@ -50,11 +50,9 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerPublicKeys
      */
-    public function testNewInstance(string $path)
+    public function testNewInstance(string $path): void
     {
         copy($path, $this->file);
 
@@ -64,13 +62,11 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerNotPublicKeys
      *
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
-    public function testNewInstanceNotPublicKey(string $path)
+    public function testNewInstanceNotPublicKey(string $path): void
     {
         copy($path, $this->file);
 
@@ -78,11 +74,9 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerPublicKeys
      */
-    public function testSanitize(string $path)
+    public function testSanitize(string $path): void
     {
         copy($path, $this->file);
 
@@ -96,7 +90,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testSanitizeProcessFailed()
+    public function testSanitizeProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
@@ -108,12 +102,9 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string $format
-     *
      * @dataProvider providerPublicKeysAndFormats
      */
-    public function testGetFormat(string $path, string $format)
+    public function testGetFormat(string $path, string $format): void
     {
         copy($path, $this->file);
 
@@ -123,11 +114,9 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerPublicKeys
      */
-    public function testGetSubject(string $path)
+    public function testGetSubject(string $path): void
     {
         copy($path, $this->file);
 
@@ -144,7 +133,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testGetSubjectProcessFailed()
+    public function testGetSubjectProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
@@ -156,11 +145,9 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerPublicKeys
      */
-    public function testGetIssuer(string $path)
+    public function testGetIssuer(string $path): void
     {
         copy($path, $this->file);
 
@@ -177,7 +164,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testGetIssuerProcessFailed()
+    public function testGetIssuerProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
@@ -189,11 +176,9 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerPublicKeys
      */
-    public function testGetNotBefore(string $path)
+    public function testGetNotBefore(string $path): void
     {
         copy($path, $this->file);
 
@@ -208,7 +193,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testGetNotBeforeProcessFailed()
+    public function testGetNotBeforeProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
@@ -220,11 +205,9 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     *
      * @dataProvider providerPublicKeys
      */
-    public function testGetNotAfter(string $path)
+    public function testGetNotAfter(string $path): void
     {
         copy($path, $this->file);
 
@@ -239,7 +222,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testGetNotAfterProcessFailed()
+    public function testGetNotAfterProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
@@ -251,12 +234,9 @@ class PublicKeyFileTest extends TestCase
     }
 
     /**
-     * @param string $path
-     * @param string $format
-     *
      * @dataProvider providerConvertFormat
      */
-    public function testConvertFormat(string $path, string $format)
+    public function testConvertFormat(string $path, string $format): void
     {
         copy($path, $this->file);
 
@@ -271,7 +251,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException
      */
-    public function testConvertFormatInvalidFormat()
+    public function testConvertFormatInvalidFormat(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
@@ -283,7 +263,7 @@ class PublicKeyFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
-    public function testConvertFormatProcessFailed()
+    public function testConvertFormatProcessFailed(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
@@ -294,7 +274,7 @@ class PublicKeyFileTest extends TestCase
         $publicKeyFile->convertFormat(PublicKeyFile::FORMAT_DER);
     }
 
-    public function testMove()
+    public function testMove(): void
     {
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
@@ -305,9 +285,6 @@ class PublicKeyFileTest extends TestCase
         $this->assertInstanceOf(PublicKeyFile::class, $publicKeyFile);
     }
 
-    /**
-     * return array[]
-     */
     public function providerPublicKeys(): array
     {
         return [
@@ -316,9 +293,6 @@ class PublicKeyFileTest extends TestCase
         ];
     }
 
-    /**
-     * return array[]
-     */
     public function providerNotPublicKeys(): array
     {
         return [
@@ -336,9 +310,6 @@ class PublicKeyFileTest extends TestCase
         ];
     }
 
-    /**
-     * return array[]
-     */
     public function providerPublicKeysAndFormats(): array
     {
         return [
@@ -347,9 +318,6 @@ class PublicKeyFileTest extends TestCase
         ];
     }
 
-    /**
-     * @return array[]
-     */
     public function providerConvertFormat(): array
     {
         return [

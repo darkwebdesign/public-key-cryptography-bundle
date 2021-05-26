@@ -24,6 +24,7 @@ namespace DarkWebDesign\PublicKeyCryptographyBundle\File;
 
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException;
 use DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
 /**
@@ -40,10 +41,8 @@ class PrivateKeyFile extends CryptoFile
      * Validates that the file is actually a private key.
      *
      * Known issues:
-     * OpenSSL (at lease 1.0.1e-fips) has issues reading PKCS#8 private keys in the DER format. Therefore these private
+     * OpenSSL (at least 1.0.1e-fips) has issues reading PKCS#8 private keys in the DER format. Therefore these private
      * keys might not be successfully validated as valid private key.
-     *
-     * @return bool
      */
     protected function validate(): bool
     {
@@ -74,10 +73,6 @@ class PrivateKeyFile extends CryptoFile
      *
      * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
      * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown.
-     *
-     * @param string|null $passPhrase
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
      *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -110,8 +105,6 @@ class PrivateKeyFile extends CryptoFile
 
     /**
      * Gets the private key format (either ascii 'pem' or binary 'der').
-     *
-     * @return string
      */
     public function getFormat(): string
     {
@@ -128,11 +121,6 @@ class PrivateKeyFile extends CryptoFile
      * OpenSSL (at lease 0.9.8zh and 1.0.1e-fips) has issues writing RSA private keys in the DER format with a pass
      * phrase. Therefore converting a pivate key with a pass phrase to the DER format might result in a private key
      * without a pass phrase.
-     *
-     * @param string $format
-     * @param string|null $passPhrase
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
      *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
@@ -177,8 +165,6 @@ class PrivateKeyFile extends CryptoFile
 
     /**
      * Checks if the private key contains a pass phrase.
-     *
-     * @return bool
      */
     public function hasPassPhrase(): bool
     {
@@ -199,10 +185,6 @@ class PrivateKeyFile extends CryptoFile
      *
      * This methods verifies if the specified pass phrase can be used to read the private key. This means that verifying
      * a private key without a pass phrase will always return true for all specified pass phrases.
-     *
-     * @param string $passPhrase
-     *
-     * @return bool
      */
     public function verifyPassPhrase(string $passPhrase): bool
     {
@@ -223,13 +205,9 @@ class PrivateKeyFile extends CryptoFile
      * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown.
      *
      * Known issues:
-     * OpenSSL (at lease 0.9.8zh and 1.0.1e-fips) has issues writing RSA private keys in the DER format with a pass
-     * phrase. Therefore adding a pass phrase to a pivate key with in the DER format might result in a private key
+     * OpenSSL (at least 0.9.8zh and 1.0.1e-fips) has issues writing RSA private keys in the DER format with a pass
+     * phrase. Therefore adding a pass phrase to a private key with in the DER format might result in a private key
      * without a pass phrase.
-     *
-     * @param string $passPhrase
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
      *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -257,10 +235,6 @@ class PrivateKeyFile extends CryptoFile
     /**
      * Removes the pass phrase from the private key.
      *
-     * @param string $passPhrase
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
-     *
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function removePassPhrase(string $passPhrase): PrivateKeyFile
@@ -284,11 +258,6 @@ class PrivateKeyFile extends CryptoFile
      *
      * It is not possible to write a private key with an empty pass phrase. Therefore passing an empty string as pass
      * phrase will result in an PrivateKeyPassPhraseEmptyException being thrown.
-     *
-     * @param string $passPhrase
-     * @param string $newPassPhrase
-     *
-     * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
      *
      * @throws \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
@@ -317,14 +286,11 @@ class PrivateKeyFile extends CryptoFile
     /**
      * Moves the file to a new location.
      *
-     * @param string $directory
-     * @param string|null $name
-     *
      * @return \DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile
      *
      * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
-    public function move($directory, $name = null): PrivateKeyFile
+    public function move(string $directory, string $name = null): File
     {
         $file = parent::move($directory, $name);
 
