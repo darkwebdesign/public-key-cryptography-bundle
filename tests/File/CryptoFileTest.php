@@ -42,11 +42,10 @@ class CryptoFileTest extends TestCase
         }
     }
 
-    /**
-     * @expectedException \BadFunctionCallException
-     */
     public function testMoveNotOverridden(): void
     {
+        $this->expectException(\BadFunctionCallException::class);
+
         $file = new MoveNotOverriddenFile($this->file);
 
         $file->move($file->getPath(), $file->getFilename());

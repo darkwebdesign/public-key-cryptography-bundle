@@ -22,8 +22,11 @@ declare(strict_types=1);
 
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Tests\File;
 
+use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException;
+use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class PublicKeyFileTest extends TestCase
 {
@@ -63,11 +66,11 @@ class PublicKeyFileTest extends TestCase
 
     /**
      * @dataProvider providerNotPublicKeys
-     *
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
     public function testNewInstanceNotPublicKey(string $path): void
     {
+        $this->expectException(FileNotValidException::class);
+
         copy($path, $this->file);
 
         new PublicKeyFile($this->file);
@@ -87,11 +90,10 @@ class PublicKeyFileTest extends TestCase
         $this->assertInstanceOf(PublicKeyFile::class, $publicKeyFile);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testSanitizeProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
         $publicKeyFile = new PublicKeyFile($this->file);
@@ -130,11 +132,10 @@ class PublicKeyFileTest extends TestCase
         ));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetSubjectProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
         $publicKeyFile = new PublicKeyFile($this->file);
@@ -161,11 +162,10 @@ class PublicKeyFileTest extends TestCase
         ));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetIssuerProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
         $publicKeyFile = new PublicKeyFile($this->file);
@@ -190,11 +190,10 @@ class PublicKeyFileTest extends TestCase
         $this->assertSame(static::TEST_NOT_BEFORE, $notBefore->format('Y-m-d H:i:s'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetNotBeforeProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
         $publicKeyFile = new PublicKeyFile($this->file);
@@ -219,11 +218,10 @@ class PublicKeyFileTest extends TestCase
         $this->assertSame(static::TEST_NOT_AFTER, $notAfter->format('Y-m-d H:i:s'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetNotAfterProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
         $publicKeyFile = new PublicKeyFile($this->file);
@@ -248,11 +246,10 @@ class PublicKeyFileTest extends TestCase
         $this->assertSame($format, $publicKeyFile->getFormat());
     }
 
-    /**
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FormatNotValidException
-     */
     public function testConvertFormatInvalidFormat(): void
     {
+        $this->expectException(FormatNotValidException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
         $publicKeyFile = new PublicKeyFile($this->file);
@@ -260,11 +257,10 @@ class PublicKeyFileTest extends TestCase
         $publicKeyFile->convertFormat('invalid-format');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testConvertFormatProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt', $this->file);
 
         $publicKeyFile = new PublicKeyFile($this->file);

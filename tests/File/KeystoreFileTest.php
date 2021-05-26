@@ -22,11 +22,13 @@ declare(strict_types=1);
 
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Tests\File;
 
+use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class KeystoreFileTest extends TestCase
 {
@@ -68,11 +70,11 @@ class KeystoreFileTest extends TestCase
 
     /**
      * @dataProvider providerNotKeystores
-     *
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
     public function testNewInstanceNotKeystoreFile(string $path): void
     {
+        $this->expectException(FileNotValidException::class);
+
         copy($path, $this->file);
 
         new KeystoreFile($this->file);
@@ -92,11 +94,10 @@ class KeystoreFileTest extends TestCase
         $this->assertTrue($keystoreFile->verifyPassPhrase(static::TEST_PASSPHRASE));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testCreateProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         $publicKeyFile = new PublicKeyFile(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt');
         $privateKeyFile = new PrivateKeyFile(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key');
 
@@ -119,11 +120,10 @@ class KeystoreFileTest extends TestCase
         $this->assertTrue($pemFile->verifyPassPhrase($passPhrase));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetPemProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
@@ -145,11 +145,10 @@ class KeystoreFileTest extends TestCase
         $this->assertInstanceOf(PublicKeyFile::class, $publicKeyFile);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetPublicKeyProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
@@ -173,11 +172,10 @@ class KeystoreFileTest extends TestCase
         $this->assertTrue($privateKeyFile->verifyPassPhrase($passPhrase));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetPrivateKeyProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
@@ -202,11 +200,10 @@ class KeystoreFileTest extends TestCase
         ));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetSubjectProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
@@ -231,11 +228,10 @@ class KeystoreFileTest extends TestCase
         ));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetIssuerProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
@@ -258,11 +254,10 @@ class KeystoreFileTest extends TestCase
         $this->assertSame(static::TEST_NOT_BEFORE, $notBefore->format('Y-m-d H:i:s'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetNotBeforeProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
@@ -285,11 +280,10 @@ class KeystoreFileTest extends TestCase
         $this->assertSame(static::TEST_NOT_AFTER, $notAfter->format('Y-m-d H:i:s'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetNotAfterProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);
@@ -324,11 +318,10 @@ class KeystoreFileTest extends TestCase
         $this->assertTrue($keystoreFile->verifyPassPhrase('new-passphrase'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testChangePassPhraseProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pkcs12-pass.p12', $this->file);
 
         $keystoreFile = new KeystoreFile($this->file);

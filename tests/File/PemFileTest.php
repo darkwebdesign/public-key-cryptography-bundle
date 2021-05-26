@@ -22,11 +22,14 @@ declare(strict_types=1);
 
 namespace DarkWebDesign\PublicKeyCryptographyBundle\Tests\File;
 
+use DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException;
+use DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\KeystoreFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PemFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PrivateKeyFile;
 use DarkWebDesign\PublicKeyCryptographyBundle\File\PublicKeyFile;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class PemFileTest extends TestCase
 {
@@ -68,11 +71,11 @@ class PemFileTest extends TestCase
 
     /**
      * @dataProvider providerNotPems
-     *
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\FileNotValidException
      */
     public function testNewInstanceNotPem(string $path): void
     {
+        $this->expectException(FileNotValidException::class);
+
         copy($path, $this->file);
 
         new PemFile($this->file);
@@ -94,11 +97,10 @@ class PemFileTest extends TestCase
         $this->assertTrue(null !== $passPhrase ? $pemFile->verifyPassPhrase($passPhrase) : true);
     }
 
-    /**
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
-     */
     public function testSanitizeEmptyPassPhrase(): void
     {
+        $this->expectException(PrivateKeyPassPhraseEmptyException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -106,11 +108,10 @@ class PemFileTest extends TestCase
         $pemFile->sanitize(static::TEST_EMPTYPASSPHRASE);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testSanitizeProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -133,22 +134,20 @@ class PemFileTest extends TestCase
         $this->assertTrue(null !== $privateKeyPassPhrase ? $pemFile->verifyPassPhrase($privateKeyPassPhrase) : true);
     }
 
-    /**
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
-     */
     public function testCreateEmptyPassPhrase(): void
     {
+        $this->expectException(PrivateKeyPassPhraseEmptyException::class);
+
         $publicKeyFile = new PublicKeyFile(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt');
         $privateKeyFile = new PrivateKeyFile(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key');
 
         PemFile::create($this->file, $publicKeyFile, $privateKeyFile, static::TEST_EMPTYPASSPHRASE);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testCreateProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         $publicKeyFile = new PublicKeyFile(__DIR__ . '/../Fixtures/Certificates/x509-pem.crt');
         $privateKeyFile = new PrivateKeyFile(__DIR__ . '/../Fixtures/Certificates/pkcs1-pass-pem.key');
 
@@ -170,11 +169,10 @@ class PemFileTest extends TestCase
         $this->assertTrue($keystoreFile->verifyPassPhrase(static::TEST_PASSPHRASE));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetKeystoreProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -196,11 +194,10 @@ class PemFileTest extends TestCase
         $this->assertInstanceOf(PublicKeyFile::class, $publicKeyFile);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetPublicKeyProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -224,11 +221,10 @@ class PemFileTest extends TestCase
         $this->assertInstanceOf(PrivateKeyFile::class, $privateKeyFile);
     }
 
-    /**
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
-     */
     public function testGetPrivateKeyEmptyPassPhrase(): void
     {
+        $this->expectException(PrivateKeyPassPhraseEmptyException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -236,11 +232,10 @@ class PemFileTest extends TestCase
         $pemFile->getPrivateKey($pemFile->getPathname(), static::TEST_EMPTYPASSPHRASE);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetPrivateKeyProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -265,11 +260,10 @@ class PemFileTest extends TestCase
         ));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetSubjectProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -296,11 +290,10 @@ class PemFileTest extends TestCase
         ));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetIssuerProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -325,11 +318,10 @@ class PemFileTest extends TestCase
         $this->assertSame(static::TEST_NOT_BEFORE, $notBefore->format('Y-m-d H:i:s'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetNotBeforeProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -354,11 +346,10 @@ class PemFileTest extends TestCase
         $this->assertSame(static::TEST_NOT_AFTER, $notAfter->format('Y-m-d H:i:s'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testGetNotAfterProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -408,11 +399,10 @@ class PemFileTest extends TestCase
         $this->assertTrue($pemFile->verifyPassPhrase(static::TEST_PASSPHRASE));
     }
 
-    /**
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
-     */
     public function testAddPassPhraseEmptyPassPhrase(): void
     {
+        $this->expectException(PrivateKeyPassPhraseEmptyException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-nopass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -420,11 +410,10 @@ class PemFileTest extends TestCase
         $pemFile->addPassPhrase(static::TEST_EMPTYPASSPHRASE);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testAddPassPhraseProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -448,11 +437,10 @@ class PemFileTest extends TestCase
         $this->assertFalse($pemFile->hasPassPhrase());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testRemovePassPhraseProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -475,11 +463,10 @@ class PemFileTest extends TestCase
         $this->assertTrue($pemFile->verifyPassPhrase('new-passphrase'));
     }
 
-    /**
-     * @expectedException \DarkWebDesign\PublicKeyCryptographyBundle\Exception\PrivateKeyPassPhraseEmptyException
-     */
     public function testChangePassPhraseEmptyPassPhrase(): void
     {
+        $this->expectException(PrivateKeyPassPhraseEmptyException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
@@ -487,11 +474,10 @@ class PemFileTest extends TestCase
         $pemFile->changePassPhrase(static::TEST_PASSPHRASE, static::TEST_EMPTYPASSPHRASE);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
-     */
     public function testChangePassPhraseProcessFailed(): void
     {
+        $this->expectException(ProcessFailedException::class);
+
         copy(__DIR__ . '/../Fixtures/Certificates/pem-pass.pem', $this->file);
 
         $pemFile = new PemFile($this->file);
