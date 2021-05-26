@@ -69,7 +69,7 @@ abstract class CryptoFile extends File
             escapeshellarg($this->getPathname())
         );
 
-        $process = new Process($command);
+        $process = Process::fromShellCommandline($command);
         $process->run();
 
         return $process->isSuccessful();

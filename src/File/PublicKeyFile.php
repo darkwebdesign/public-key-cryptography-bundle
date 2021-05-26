@@ -45,14 +45,14 @@ class PublicKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $process = new Process("openssl x509 -in $in -inform $inForm -noout");
+        $process = Process::fromShellCommandline("openssl x509 -in $in -inform $inForm -noout");
         $process->run();
 
         if (!$process->isSuccessful()) {
             return false;
         }
 
-        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass:anypass -check -noout");
+        $process = Process::fromShellCommandline("openssl rsa -in $in -inform $inForm -passin pass:anypass -check -noout");
         $process->run();
 
         $badDecrypt = false !== strpos($process->getErrorOutput(), ':bad decrypt:');
@@ -76,7 +76,7 @@ class PublicKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $process = new Process("openssl x509 -in $in -inform $inForm -outform $inForm");
+        $process = Process::fromShellCommandline("openssl x509 -in $in -inform $inForm -outform $inForm");
         $process->mustRun();
 
         @file_put_contents($this->getPathname(), $process->getOutput());
@@ -108,7 +108,7 @@ class PublicKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $process = new Process("openssl x509 -in $in -inform $inForm -noout -subject");
+        $process = Process::fromShellCommandline("openssl x509 -in $in -inform $inForm -noout -subject");
         $process->mustRun();
 
         return trim(preg_replace('/^subject=/', '', $process->getOutput()));
@@ -126,7 +126,7 @@ class PublicKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $process = new Process("openssl x509 -in $in -inform $inForm -noout -issuer");
+        $process = Process::fromShellCommandline("openssl x509 -in $in -inform $inForm -noout -issuer");
         $process->mustRun();
 
         return trim(preg_replace('/^issuer=/', '', $process->getOutput()));
@@ -144,7 +144,7 @@ class PublicKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $process = new Process("openssl x509 -in $in -inform $inForm -noout -startdate");
+        $process = Process::fromShellCommandline("openssl x509 -in $in -inform $inForm -noout -startdate");
         $process->mustRun();
 
         return new \DateTime(trim(preg_replace('/^notBefore=/', '', $process->getOutput())));
@@ -162,7 +162,7 @@ class PublicKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $process = new Process("openssl x509 -in $in -inform $inForm -noout -enddate");
+        $process = Process::fromShellCommandline("openssl x509 -in $in -inform $inForm -noout -enddate");
         $process->mustRun();
 
         return new \DateTime(trim(preg_replace('/^notAfter=/', '', $process->getOutput())));
@@ -194,7 +194,7 @@ class PublicKeyFile extends CryptoFile
         $inForm = escapeshellarg($this->getFormat());
         $outForm = escapeshellarg($format);
 
-        $process = new Process("openssl x509 -in $in -inform $inForm -outform $outForm");
+        $process = Process::fromShellCommandline("openssl x509 -in $in -inform $inForm -outform $outForm");
         $process->mustRun();
 
         @file_put_contents($this->getPathname(), $process->getOutput());

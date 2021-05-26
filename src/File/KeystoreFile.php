@@ -40,7 +40,7 @@ class KeystoreFile extends CryptoFile
     {
         $in = escapeshellarg($this->getPathname());
 
-        $process = new Process("openssl pkcs12 -in $in -passin pass:anypass -noout");
+        $process = Process::fromShellCommandline("openssl pkcs12 -in $in -passin pass:anypass -noout");
         $process->run();
 
         $invalidPassword = false !== strpos($process->getErrorOutput(), 'invalid password');
@@ -78,13 +78,13 @@ class KeystoreFile extends CryptoFile
         $privateKeyInForm = escapeshellarg($privateKeyFile->getFormat());
         $privateKeyPass = escapeshellarg((string) $privateKeyPassPhrase);
 
-        $process1 = new Process("openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass -passout pass:pipe -des3");
+        $process1 = Process::fromShellCommandline("openssl rsa -in $privateKeyIn -inform $privateKeyInForm -passin pass:$privateKeyPass -passout pass:pipe -des3");
         $process1->mustRun();
 
-        $process2 = new Process("openssl x509 -in $publicKeyIn -inform $publicKeyInForm");
+        $process2 = Process::fromShellCommandline("openssl x509 -in $publicKeyIn -inform $publicKeyInForm");
         $process2->mustRun();
 
-        $process3 = new Process("openssl pkcs12 -passin pass:pipe -passout pass:$pass -export");
+        $process3 = Process::fromShellCommandline("openssl pkcs12 -passin pass:pipe -passout pass:$pass -export");
         $process3->setInput($process1->getOutput() . $process2->getOutput());
         $process3->mustRun();
 
@@ -116,17 +116,17 @@ class KeystoreFile extends CryptoFile
             $rsaPassOut = '';
         }
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe");
+        $process1 = Process::fromShellCommandline("openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe");
         $process1->mustRun();
 
-        $process2 = new Process("openssl rsa -passin pass:pipe $rsaPassOut");
+        $process2 = Process::fromShellCommandline("openssl rsa -passin pass:pipe $rsaPassOut");
         $process2->setInput($process1->getOutput());
         $process2->mustRun();
 
-        $process3 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
+        $process3 = Process::fromShellCommandline("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process3->mustRun();
 
-        $process4 = new Process("openssl x509");
+        $process4 = Process::fromShellCommandline("openssl x509");
         $process4->setInput($process3->getOutput());
         $process4->mustRun();
 
@@ -151,10 +151,10 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
+        $process1 = Process::fromShellCommandline("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process1->mustRun();
 
-        $process2 = new Process("openssl x509");
+        $process2 = Process::fromShellCommandline("openssl x509");
         $process2->setInput($process1->getOutput());
         $process2->mustRun();
 
@@ -189,10 +189,10 @@ class KeystoreFile extends CryptoFile
             $rsaPassOut = '';
         }
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe");
+        $process1 = Process::fromShellCommandline("openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe");
         $process1->mustRun();
 
-        $process2 = new Process("openssl rsa -passin pass:pipe $rsaPassOut");
+        $process2 = Process::fromShellCommandline("openssl rsa -passin pass:pipe $rsaPassOut");
         $process2->setInput($process1->getOutput());
         $process2->mustRun();
 
@@ -216,10 +216,10 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
+        $process1 = Process::fromShellCommandline("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process1->mustRun();
 
-        $process2 = new Process('openssl x509 -noout -subject');
+        $process2 = Process::fromShellCommandline('openssl x509 -noout -subject');
         $process2->setInput($process1->getOutput());
         $process2->mustRun();
 
@@ -240,10 +240,10 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
+        $process1 = Process::fromShellCommandline("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process1->mustRun();
 
-        $process2 = new Process('openssl x509 -noout -issuer');
+        $process2 = Process::fromShellCommandline('openssl x509 -noout -issuer');
         $process2->setInput($process1->getOutput());
         $process2->mustRun();
 
@@ -264,10 +264,10 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
+        $process1 = Process::fromShellCommandline("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process1->mustRun();
 
-        $process2 = new Process('openssl x509 -noout -startdate');
+        $process2 = Process::fromShellCommandline('openssl x509 -noout -startdate');
         $process2->setInput($process1->getOutput());
         $process2->mustRun();
 
@@ -288,10 +288,10 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
+        $process1 = Process::fromShellCommandline("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process1->mustRun();
 
-        $process2 = new Process('openssl x509 -noout -enddate');
+        $process2 = Process::fromShellCommandline('openssl x509 -noout -enddate');
         $process2->setInput($process1->getOutput());
         $process2->mustRun();
 
@@ -310,7 +310,7 @@ class KeystoreFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $pass = escapeshellarg($passPhrase);
 
-        $process = new Process("openssl pkcs12 -in $in -passin pass:$pass -noout");
+        $process = Process::fromShellCommandline("openssl pkcs12 -in $in -passin pass:$pass -noout");
         $process->run();
 
         return $process->isSuccessful();
@@ -332,21 +332,21 @@ class KeystoreFile extends CryptoFile
         $pass = escapeshellarg($passPhrase);
         $newPass = escapeshellarg($newPassPhrase);
 
-        $process1 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe");
+        $process1 = Process::fromShellCommandline("openssl pkcs12 -in $in -passin pass:$pass -nocerts -passout pass:pipe");
         $process1->mustRun();
 
-        $process2 = new Process("openssl rsa -passin pass:pipe -passout pass:pipe");
+        $process2 = Process::fromShellCommandline("openssl rsa -passin pass:pipe -passout pass:pipe");
         $process2->setInput($process1->getOutput());
         $process2->mustRun();
 
-        $process3 = new Process("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
+        $process3 = Process::fromShellCommandline("openssl pkcs12 -in $in -passin pass:$pass -nokeys -clcerts");
         $process3->mustRun();
 
-        $process4 = new Process("openssl x509");
+        $process4 = Process::fromShellCommandline("openssl x509");
         $process4->setInput($process3->getOutput());
         $process4->mustRun();
 
-        $process5 = new Process("openssl pkcs12 -passin pass:pipe -passout pass:$newPass -export");
+        $process5 = Process::fromShellCommandline("openssl pkcs12 -passin pass:pipe -passout pass:$newPass -export");
         $process5->setInput($process2->getOutput() . $process4->getOutput());
         $process5->mustRun();
 
