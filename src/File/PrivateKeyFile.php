@@ -50,7 +50,7 @@ class PrivateKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass:anypass -check -noout");
+        $process = Process::fromShellCommandline("openssl rsa -in $in -inform $inForm -passin pass:anypass -check -noout");
         $process->run();
 
         $badDecrypt = false !== strpos($process->getErrorOutput(), ':bad decrypt:');
@@ -59,7 +59,7 @@ class PrivateKeyFile extends CryptoFile
             return false;
         }
 
-        $process = new Process("openssl x509 -in $in -inform $inForm -noout");
+        $process = Process::fromShellCommandline("openssl x509 -in $in -inform $inForm -noout");
         $process->run();
 
         if ($process->isSuccessful()) {
@@ -98,7 +98,7 @@ class PrivateKeyFile extends CryptoFile
             $rsaPassOut = '';
         }
 
-        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass:$pass -outform $inForm $rsaPassOut");
+        $process = Process::fromShellCommandline("openssl rsa -in $in -inform $inForm -passin pass:$pass -outform $inForm $rsaPassOut");
         $process->mustRun();
 
         @file_put_contents($this->getPathname(), $process->getOutput());
@@ -165,7 +165,7 @@ class PrivateKeyFile extends CryptoFile
             $rsaPassOut = '';
         }
 
-        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass:$pass -outform $outForm $rsaPassOut");
+        $process = Process::fromShellCommandline("openssl rsa -in $in -inform $inForm -passin pass:$pass -outform $outForm $rsaPassOut");
         $process->mustRun();
 
         @file_put_contents($this->getPathname(), $process->getOutput());
@@ -185,10 +185,10 @@ class PrivateKeyFile extends CryptoFile
         $in = escapeshellarg($this->getPathname());
         $inForm = escapeshellarg($this->getFormat());
 
-        $process1 = new Process("openssl rsa -in $in -inform $inForm -passin pass:nopass -check -noout");
+        $process1 = Process::fromShellCommandline("openssl rsa -in $in -inform $inForm -passin pass:nopass -check -noout");
         $process1->run();
 
-        $process2 = new Process("openssl rsa -in $in -inform $inForm -passin pass:anypass -check -noout");
+        $process2 = Process::fromShellCommandline("openssl rsa -in $in -inform $inForm -passin pass:anypass -check -noout");
         $process2->run();
 
         return !$process1->isSuccessful() && !$process2->isSuccessful();
@@ -210,7 +210,7 @@ class PrivateKeyFile extends CryptoFile
         $inForm = escapeshellarg($this->getFormat());
         $pass = escapeshellarg($passPhrase);
 
-        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass:$pass -check -noout");
+        $process = Process::fromShellCommandline("openssl rsa -in $in -inform $inForm -passin pass:$pass -check -noout");
         $process->run();
 
         return $process->isSuccessful();
@@ -244,7 +244,7 @@ class PrivateKeyFile extends CryptoFile
         $inForm = escapeshellarg($this->getFormat());
         $pass = escapeshellarg($passPhrase);
 
-        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass:nopass -outform $inForm -passout pass:$pass -des3");
+        $process = Process::fromShellCommandline("openssl rsa -in $in -inform $inForm -passin pass:nopass -outform $inForm -passout pass:$pass -des3");
         $process->mustRun();
 
         @file_put_contents($this->getPathname(), $process->getOutput());
@@ -269,7 +269,7 @@ class PrivateKeyFile extends CryptoFile
         $inForm = escapeshellarg($this->getFormat());
         $pass = escapeshellarg($passPhrase);
 
-        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass:$pass -outform $inForm");
+        $process = Process::fromShellCommandline("openssl rsa -in $in -inform $inForm -passin pass:$pass -outform $inForm");
         $process->mustRun();
 
         @file_put_contents($this->getPathname(), $process->getOutput());
@@ -304,7 +304,7 @@ class PrivateKeyFile extends CryptoFile
         $pass = escapeshellarg($passPhrase);
         $newPass = escapeshellarg($newPassPhrase);
 
-        $process = new Process("openssl rsa -in $in -inform $inForm -passin pass:$pass -outform $inForm -passout pass:$newPass -des3");
+        $process = Process::fromShellCommandline("openssl rsa -in $in -inform $inForm -passin pass:$pass -outform $inForm -passout pass:$newPass -des3");
         $process->mustRun();
 
         @file_put_contents($this->getPathname(), $process->getOutput());
