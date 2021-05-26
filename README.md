@@ -6,8 +6,8 @@
 
 [![Build Status](https://travis-ci.org/darkwebdesign/public-key-cryptography-bundle.svg?branch=1.1)](https://travis-ci.org/darkwebdesign/public-key-cryptography-bundle?branch=1.1)
 [![Coverage Status](https://codecov.io/gh/darkwebdesign/public-key-cryptography-bundle/branch/1.1/graph/badge.svg)](https://codecov.io/gh/darkwebdesign/public-key-cryptography-bundle)
-[![PHP Version](https://img.shields.io/badge/php-7.1%2B-777BB3.svg)](https://php.net/)
-[![Symfony Version](https://img.shields.io/badge/symfony-4.x-93C74B.svg)](https://symfony.com/)
+[![PHP Version](https://img.shields.io/badge/php-7.2%2B-777BB3.svg)](https://php.net/)
+[![Symfony Version](https://img.shields.io/badge/symfony-5.x-93C74B.svg)](https://symfony.com/)
 
 Public Key Cryptography Bundle is a collection of public/private key cryptography components that you can use in your
 Symfony applications.
